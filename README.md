@@ -43,7 +43,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/ejoosterop/quke">
-    <img src="media/llms.png" alt="Logo" width="240" height="160">
+    <img src="https://github.com/ejoosterop/quke/media/llms.png" alt="Logo" width="240" height="160">
   </a>
 
 <h3 align="center">quke</h3>
