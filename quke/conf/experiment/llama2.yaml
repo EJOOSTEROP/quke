@@ -1,0 +1,5 @@
+# @package _global_
+defaults:
+  - override /llm: llama2
+  - override /embedding: openai
+  - override /question: eps

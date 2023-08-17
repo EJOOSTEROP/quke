@@ -1,0 +1,15 @@
+module_name_llm: langchain.llms
+class_name_llm: Replicate
+name: a16z-infra/llama-2-7b-chat:5ec5fdadd80ace49f5a2b2178cceeb9f2f77c493b85b1131002c26e6b2b13184
+#name: a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5
+
+llm_args:
+  model: ${llm.name}
+  input:
+    temperature: 0.75
+    max_length: 500
+    max_new_tokens: 500
+    min_new_tokens: -1
+    top_p: 1
+
+# NOTE: At present responses for the 13B version are too short to be useful. Not sure what is causing this.

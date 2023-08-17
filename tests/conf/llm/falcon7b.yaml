@@ -1,0 +1,11 @@
+module_name_llm: langchain.llms
+class_name_llm: HuggingFaceHub
+name: tiiuae/falcon-7b-instruct
+
+llm_args:
+  repo_id: ${llm.name}
+  model_kwargs: 
+    max_length: 2000
+    temperature: 0.5
+    max_new_tokens: 200
+    num_return_sequences: 3

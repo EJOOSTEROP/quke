@@ -1,0 +1,8 @@
+#type: OpenAI #import OpenAI maybe needed to set the API key, though langchain may just take it from env?
+module_name_llm: langchain.chat_models
+class_name_llm: ChatOpenAI
+name: gpt-3.5-turbo-0301
+
+llm_args:
+  model_name: ${llm.name}
+  temperature: 0

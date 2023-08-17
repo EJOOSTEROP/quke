@@ -1,0 +1,15 @@
+internal_data_folder: idata
+source_document_folder: "./docs/pdf/"
+experiment_summary_file: 'chat_session.md'
+
+embed_only: False
+
+defaults:
+  - _self_
+  - llm: falcon7b
+  - embedding: huggingface
+  - question: eps
+
+hydra:
+  job:
+    chdir: False

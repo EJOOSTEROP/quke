@@ -1,0 +1,4 @@
+poetry run quke embedding=huggingface llm=llama2 ++question.questions=['Using only the document provided can you tell what is Lufthansa? End your answer with my pleasure.']
+==> Cohere, OpenAI say the document does not mention Lufthansa.
+==> Falcon7b comes back with an answer, describing Lufthansa correctly but clearly not using the AIF. Not sure if this is Falcon or HuggingFace who is the problem.
+==> Llama2 (using Replicate) does not return an answer at the moment. Somehow Lanchain is also not timing out...

@@ -1,0 +1,7 @@
+module_name_llm: langchain.llms
+class_name_llm: Cohere
+name: command-nightly
+
+llm_args:
+  model: ${llm.name}
+  temperature: 0

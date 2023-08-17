@@ -1,0 +1,28 @@
+vectordb:
+  module_name: langchain.vectorstores
+  class_name: Chroma
+  vectorstore_location: vector_store/chromadb_hf_recursive
+
+  # Possible values for vectorstore_write_mode: overwrite, no_overwrite, append
+  # This works at the vectorstore_location level. 
+  # -If the folder exists and 'no_overwrite' is specified: document will not be embedded
+  # -If the folder exists and 'overwrite' is specified, all contents of the vectordb folder will be deleted and a new vectordb will be created.
+  # -If set to 'append' the new embeddings will be appended to any existing vectordb. If a source document is specified twice it will be embedded twice.
+  vectorstore_write_mode: overwrite
+
+embedding:
+  module_name: langchain.embeddings
+  class_name: HuggingFaceHubEmbeddings
+  kwargs: #optional
+    repo_id: sentence-transformers/all-mpnet-base-v2
+  rate_limit_chunks: 201 # max about 200 when I trialed (free account). Must depend on many considerations.
+  rate_limit_delay: 306 # in seconds
+
+splitter:
+  module_name: langchain.text_splitter
+  class_name: RecursiveCharacterTextSplitter
+  args:
+    chunk_size: 800
+    chunk_overlap: 200
+#    separator: "\n"
+    length_function: len # this cannot be configured. Can only be len (or not present)
