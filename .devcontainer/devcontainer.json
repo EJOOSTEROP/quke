@@ -31,7 +31,7 @@
 				"ms-python.python",
 				"ms-python.vscode-pylance",
 				"Gruntfuggly.todo-tree",
-				"GitHub.vscode-pull-request-github",
+				"GitHub.vscode-pull-request-github"
 			]
 		}
 	},
