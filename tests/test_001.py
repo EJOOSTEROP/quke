@@ -1,7 +1,9 @@
 import os
+from pathlib import Path
 
 import pytest
 from hydra import compose, initialize
+from omegaconf import DictConfig
 
 from quke.embed import embed, get_chunks_from_pages, get_pages_from_document
 from quke.llm_chat import chat
@@ -29,9 +31,10 @@ def GetConfigEmbedOnly():
 
 
 @pytest.fixture(scope="session")
-def GetConfigLLMOnly(tmp_path_factory):
+def GetConfigLLMOnly(tmp_path_factory: pytest.TempPathFactory):
     folder = tmp_path_factory.mktemp("output")
-    output_file = os.path.join(folder, OUTPUT_FILE)
+    #output_file = os.path.join(folder, OUTPUT_FILE)
+    output_file = Path(folder) / OUTPUT_FILE
     with initialize(version_base=None, config_path="./conf"):
         cfg = compose(
             config_name="config",
@@ -51,7 +54,7 @@ def GetPages() -> list:
 
 
 @pytest.fixture(scope="session")
-def GetChunks(GetPages: list, GetConfigEmbedOnly) -> list:
+def GetChunks(GetPages: list, GetConfigEmbedOnly: DictConfig) -> list:
     return get_chunks_from_pages(
         GetPages, ConfigParser(GetConfigEmbedOnly).get_splitter_params()
     )
@@ -67,7 +70,7 @@ def test_documentloader(GetPages: list):
     assert text_file_found
 
 
-def test_getchunks(GetChunks):
+def test_getchunks(GetChunks: list):
     assert len(GetChunks) == 1  # with current basic test just equals 1
 
 
@@ -84,7 +87,7 @@ def test_config():
 @pytest.mark.expensive()
 # Do the following to exlude this
 # poetry run pytest -m 'not expensive'
-def test_embed(GetConfigEmbedOnly):
+def test_embed(GetConfigEmbedOnly: DictConfig):
     chunks_embedded = embed(**ConfigParser(GetConfigEmbedOnly).get_embed_params())
     assert chunks_embedded == 1
 
@@ -92,9 +95,9 @@ def test_embed(GetConfigEmbedOnly):
 @pytest.mark.expensive()
 # @pytest.mark.skipif(not os.path.exists(os.path.dirname(OUTPUT_FILE)),
 # reason=f"Output folder {os.path.dirname(OUTPUT_FILE)} should exist before running test.")
-def test_chat(GetConfigLLMOnly):
+def test_chat(GetConfigLLMOnly: DictConfig):
     from langchain.chains import ConversationalRetrievalChain
 
     chat_result = chat(**ConfigParser(GetConfigLLMOnly).get_chat_params())
     assert isinstance(chat_result, ConversationalRetrievalChain)
-    assert os.path.isfile(ConfigParser(GetConfigLLMOnly).output_file)
+    assert Path(ConfigParser(GetConfigLLMOnly).output_file).is_file()
