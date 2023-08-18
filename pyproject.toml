@@ -41,6 +41,10 @@ rich = "^13.5.2"
 pytest = "^7.4.0"
 requests-mock = "^1.11.0"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^4.1.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -101,6 +105,11 @@ fixable = [
     "PLR2004", # Magic value used in comparison, ...
     "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
     "D",  # no pydocstyle
+]
+
+"noxfile.py" = [
+    "ANN",
+    "D",
 ]
 
 [tool.ruff.pydocstyle]
