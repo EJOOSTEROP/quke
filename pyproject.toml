@@ -92,6 +92,7 @@ fixable = [
     "NPY001",  # Fix numpy types, which are removed in 1.24.
     "RUF100",  # Remove unused noqa comments.
     "I",  # Fix import order
+    "PTH",  # Path.cwd()
 ]
 
 [tool.ruff.per-file-ignores]
