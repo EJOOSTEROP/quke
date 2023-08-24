@@ -83,6 +83,7 @@ select = [  # https://beta.ruff.rs/docs/rules/
 ignore = [
     "E203",  # comments allowed
     "E501",
+    "ANN101", # type annotation for self
 ]
 
 # fixing is off by default
