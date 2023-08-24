@@ -6,7 +6,7 @@ import shutil
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
-from glob import glob
+from pathlib import Path
 
 # [ ] TODO: PyMU is faster, PyPDF more accurate: https://github.com/py-pdf/benchmarks
 from langchain.document_loaders import CSVLoader, PyMuPDFLoader, TextLoader
@@ -46,13 +46,14 @@ def get_loaders(src_doc_folder: str, loader: DocumentLoaderDef) -> list:
 
     # to make ext case insensitive
     ext = "".join([f"[{ch}{ch.swapcase()}]" for ch in ext])
-    src_file_names = glob(
-        os.path.join(src_doc_folder, "**", f"*.{ext}"), recursive=True
-    )  # also looks in subfolders
+
+    src_file_names = Path(src_doc_folder).rglob(f"**/*.{ext}")
 
     # TODO: Problem with embedding more than 2 files at once, or some number of pages/chunks (using HF)?
     # Error message does not really help. Appending in steps does work.
-    loaders = [loader.loader(pdf_name, **loader.kwargs) for pdf_name in src_file_names]
+    loaders = [
+        loader.loader(str(pdf_name), **loader.kwargs) for pdf_name in src_file_names
+    ]
 
     return loaders
 
@@ -77,7 +78,7 @@ def get_pages_from_document(src_doc_folder: str) -> list:
     return pages
 
 
-def get_chunks_from_pages(pages: list, splitter_params) -> list:
+def get_chunks_from_pages(pages: list, splitter_params: dict) -> list:
     """Splits pages into smaller chunks used for embedding."""
     # for splitter args containing 'func', the yaml value is converted into a Python function.
     # TODO: Security risk? Hence a safe_list of functions is provided; severly limiting flexibility.
@@ -88,7 +89,7 @@ def get_chunks_from_pages(pages: list, splitter_params) -> list:
         if ("func".lower() in key.lower()) and splitter_params["splitter_args"][
             key
         ] in safe_function_list:
-            splitter_params["splitter_args"][key] = eval(
+            splitter_params["splitter_args"][key] = eval(  # noqa: S307
                 splitter_params["splitter_args"][key]
             )
 
@@ -118,28 +119,28 @@ def embed(
     logging.info(f"Starting to embed into VectorDB: {vectordb_location}")
 
     # if folder does not exist, or write_mode is APPEND no need to do anything here.
-    if os.path.exists(vectordb_location) and not os.path.isfile(  # noqa: SIM102
-        vectordb_location
+    if (
+        Path(vectordb_location).exists()
+        and (not Path(vectordb_location).is_file())
+        and os.listdir(vectordb_location)
     ):
-        if os.listdir(
-            vectordb_location
-        ):  # path exists and is not empty - assumed to contain vectordb
-            if write_mode == DatabaseAction.NO_OVERWRITE:  # skip embedding
-                logging.info(
-                    f"No new embeddings created. Embedding database already exists at "
-                    f"{vectordb_location!r}. Remove database folder, or change embedding config "
-                    "vectorstore_write_mode to OVERWRITE or APPEND."
-                )
-                return
-            if (
-                write_mode == DatabaseAction.OVERWRITE
-            ):  # remove exising database before embedding
-                # TODO: Is this too harsh to delete the full folder? At least create a backup?
-                logging.warning(
-                    f"The folder containing the embedding database ({vectordb_location}) and all its contents "
-                    "about to be overwritten."
-                )
-                shutil.rmtree(vectordb_location)
+        # path exists and is not empty - assumed to contain vectordb
+        if write_mode == DatabaseAction.NO_OVERWRITE:  # skip embedding
+            logging.info(
+                f"No new embeddings created. Embedding database already exists at "
+                f"{vectordb_location!r}. Remove database folder, or change embedding config "
+                "vectorstore_write_mode to OVERWRITE or APPEND."
+            )
+            return
+        if (
+            write_mode == DatabaseAction.OVERWRITE
+        ):  # remove exising database before embedding
+            # TODO: Is this too harsh to delete the full folder? At least create a backup?
+            logging.warning(
+                f"The folder containing the embedding database ({vectordb_location}) and all its contents "
+                "about to be overwritten."
+            )
+            shutil.rmtree(vectordb_location)
 
     # get bite sized chunks from source documents
     chunks = get_chunks_from_pages(
@@ -152,7 +153,7 @@ def embed(
     )
 
     # Use chunker to embed in chunks with a wait time in between. As a basic way to deal with some rate limiting.
-    def chunker(seq, size):
+    def chunker(seq: list, size: int) -> list:
         return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
     c = 0
@@ -174,7 +175,7 @@ def embed(
 
 
 def embed_these_chunks(
-    chunks,
+    chunks: list,
     vectordb_location: str,
     embedding_import: ClassImportDefinition,
     embedding_kwargs: dict,
