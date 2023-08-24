@@ -33,7 +33,7 @@ def GetConfigEmbedOnly():
 @pytest.fixture(scope="session")
 def GetConfigLLMOnly(tmp_path_factory: pytest.TempPathFactory):
     folder = tmp_path_factory.mktemp("output")
-    #output_file = os.path.join(folder, OUTPUT_FILE)
+    # output_file = os.path.join(folder, OUTPUT_FILE)
     output_file = Path(folder) / OUTPUT_FILE
     with initialize(version_base=None, config_path="./conf"):
         cfg = compose(

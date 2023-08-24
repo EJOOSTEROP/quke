@@ -1,9 +1,9 @@
 """Sets up all elements required for a chat session."""
 import importlib
 import logging  # functionality managed by Hydra
-import os
 from collections import defaultdict
 from datetime import datetime
+from pathlib import Path
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
@@ -18,9 +18,9 @@ def chat(
     embedding_import: ClassImportDefinition,
     vectordb_import: ClassImportDefinition,
     llm_import: ClassImportDefinition,
-    llm_parameters,
-    prompt_parameters,
-    output_file,
+    llm_parameters: dict,
+    prompt_parameters: dict,
+    output_file: dict,
 ) -> object:
     """Initiates a chat with an LLM.
 
@@ -88,9 +88,9 @@ def chat_output(question: str, result: dict) -> None:
 
 
 # TODO: Either I do not understand mdutils or it is an unfriendly package when trying to append.
-def chat_output_to_file(result: dict, output_file) -> None:
+def chat_output_to_file(result: dict, output_file: dict) -> None:
     """Populates a record of the chat with the LLM into a markdown file."""
-    first_write = not os.path.isfile(output_file["path"])
+    first_write = not Path(output_file["path"]).is_file()
 
     mdFile = MdUtils(file_name="tmp.md")
 
@@ -120,8 +120,18 @@ def chat_output_to_file(result: dict, output_file) -> None:
     new.append_end((mdFile.get_md_text()).strip())
 
 
-def dict_crosstab(source, key, listed, missing="NA"):
-    """Limited and simple version of a crosstab query on a dict."""
+def dict_crosstab(source: list, key: str, listed: str, missing: str = "NA") -> dict:
+    """Limited and simple version of a crosstab query on a dict.
+
+    Args:
+        source (list): _description_
+        key (str): _description_
+        listed (str): _description_
+        missing (str, optional): _description_. Defaults to "NA".
+
+    Returns:
+        _type_: _description_
+    """
     dict_subs = []
     for d in source:
         dict_subs.append({key: d[key], listed: d.get(listed, missing)}.values())
