@@ -8,7 +8,7 @@ nox.options.sessions = ["black", "ruff"]
 
 
 # TODO: Is this an option: https://nox-poetry.readthedocs.io/en/stable/
-# TODO: or a better option: https://github.com/pdm-project/pdm
+# TODO: or a better option: https://github.com/pdm-project/pdm (instead of Poetry)
 @nox.session
 def flake(session):
     session.install(
