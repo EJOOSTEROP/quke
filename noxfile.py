@@ -4,6 +4,8 @@
 # especially look at roughly line 51, flake/lint
 import nox
 
+nox.options.sessions = ["black", "ruff"]
+
 
 # TODO: Is this an option: https://nox-poetry.readthedocs.io/en/stable/
 @nox.session
