@@ -34,13 +34,6 @@ class ConfigParser:
         self.src_doc_folder = cfg.source_document_folder
 
         # TODO: Is this sufficiently robust? What if the user wants a folder not related to wcd/pwd?
-        # Consider using os.path.isabs(path) or os.path.abspath(path). Or just pass the string and
-        # 'Python will handle it'?
-        """self.vectordb_location = os.path.join(
-            os.getcwd(),
-            cfg.internal_data_folder,
-            cfg.embedding.vectordb.vectorstore_location,
-        )"""
         self.vectordb_location = str(
             Path.cwd()
             / cfg.internal_data_folder
@@ -90,10 +83,6 @@ class ConfigParser:
         # TODO: need something better for output folder
         # https://hydra.cc/docs/tutorials/basic/running_your_app/working_directory/
         try:  # try statement done for testing suite
-            """self.output_file = os.path.join(
-                hydra.core.hydra_config.HydraConfig.get()["runtime"]["output_dir"],
-                cfg.experiment_summary_file,
-            )"""
             self.output_file = str(
                 Path(hydra.core.hydra_config.HydraConfig.get()["runtime"]["output_dir"])
                 / cfg.experiment_summary_file
