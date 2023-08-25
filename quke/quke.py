@@ -3,7 +3,7 @@
 LLMs, embedding model, vector store and other components can be congfigured.
 """
 import logging  # functionality managed by Hydra
-import os
+from pathlib import Path
 
 import hydra
 from dotenv import find_dotenv, load_dotenv
@@ -36,10 +36,15 @@ class ConfigParser:
         # TODO: Is this sufficiently robust? What if the user wants a folder not related to wcd/pwd?
         # Consider using os.path.isabs(path) or os.path.abspath(path). Or just pass the string and
         # 'Python will handle it'?
-        self.vectordb_location = os.path.join(
+        """self.vectordb_location = os.path.join(
             os.getcwd(),
             cfg.internal_data_folder,
             cfg.embedding.vectordb.vectorstore_location,
+        )"""
+        self.vectordb_location = str(
+            Path.cwd()
+            / cfg.internal_data_folder
+            / cfg.embedding.vectordb.vectorstore_location
         )
         self.embedding_import = ClassImportDefinition(
             cfg.embedding.embedding.module_name, cfg.embedding.embedding.class_name
@@ -85,14 +90,19 @@ class ConfigParser:
         # TODO: need something better for output folder
         # https://hydra.cc/docs/tutorials/basic/running_your_app/working_directory/
         try:  # try statement done for testing suite
-            self.output_file = os.path.join(
+            """self.output_file = os.path.join(
                 hydra.core.hydra_config.HydraConfig.get()["runtime"]["output_dir"],
                 cfg.experiment_summary_file,
+            )"""
+            self.output_file = str(
+                Path(hydra.core.hydra_config.HydraConfig.get()["runtime"]["output_dir"])
+                / cfg.experiment_summary_file
             )
+
         except Exception:
             self.output_file = cfg.experiment_summary_file
 
-    def get_embed_params(self):
+    def get_embed_params(self) -> dict:
         """Based on the config files returns the set of parameters need to start embedding."""
         embed_parameters = {
             "src_doc_folder": self.src_doc_folder,
@@ -106,7 +116,7 @@ class ConfigParser:
         }
         return embed_parameters
 
-    def get_chat_params(self):
+    def get_chat_params(self) -> dict:
         """Based on the config files returns the set of parameters need to start a chat."""
         chat_parameters = {
             "vectordb_location": self.vectordb_location,
@@ -126,11 +136,11 @@ class ConfigParser:
             "splitter_args": self.splitter_args,
         }
 
-    def get_args_dict(self, cfg_sub):
+    def get_args_dict(self, cfg_sub: dict) -> dict:
         """Takes a subset of the Hydra configs and returns the same as a dict."""
         return OmegaConf.to_container(cfg_sub, resolve=True)
 
-    def get_llm_parameters(self):
+    def get_llm_parameters(self) -> dict:
         """Based on the config files returns the set of parameters needed to setup an LLM."""
         return OmegaConf.to_container(self.cfg.llm.llm_args, resolve=True)
 
