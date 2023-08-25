@@ -43,9 +43,7 @@ def test(session):
     # session.install("pytest")
     # session.install("pytest-cov")
 
-    test_files = session.posargs if session.posargs else []
+    session.run("pytest", "--cov=quke", "tests/")
 
-    # session.run("pytest", *test_files)
-    # session.run("pytest", "--cov=quke",  "tests/")
-    session.run("pytest", "--cov=quke", *test_files)
-    # session.run("pytest")
+    # test_files = session.posargs if session.posargs else []
+    # session.run("pytest", "--cov=quke", *test_files)
