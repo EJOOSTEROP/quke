@@ -59,7 +59,14 @@ def get_loaders(src_doc_folder: str, loader: DocumentLoaderDef) -> list:
 
 
 def get_pages_from_document(src_doc_folder: str) -> list:
-    """Reads documents from the directory/folder provided and returns a list of pages and metadata."""
+    """Reads documents from the directory/folder provided and returns a list of pages and metadata.
+
+    Args:
+        src_doc_folder: Folder containing the source documents.
+
+    Returns:
+        List containing one page per list item, as text.
+    """
     pages = []
     for docloader in DOC_LOADERS:
         for loader in get_loaders(src_doc_folder, docloader):
@@ -79,9 +86,20 @@ def get_pages_from_document(src_doc_folder: str) -> list:
 
 
 def get_chunks_from_pages(pages: list, splitter_params: dict) -> list:
-    """Splits pages into smaller chunks used for embedding."""
-    # for splitter args containing 'func', the yaml value is converted into a Python function.
-    # TODO: Security risk? Hence a safe_list of functions is provided; severly limiting flexibility.
+    """Splits pages into smaller chunks used for embedding.
+
+    Args:
+        pages: List with page text of a document(s).
+        splitter_params: Dictionary with settings for splitting logic, having
+        keys splitter_args and splitter_import.
+        splitter_args are provided to the splitter function as **kwargs. Note that if a keyword
+        contains 'func' the value will be evaluated as a python function (only 'len' allowed).
+
+    Returns:
+        A list of smaller text chunks from the pages. In a next step to be used for embedding.
+    """
+    # TODO: eval() is a security risk. Hence a safe_list of functions is provided; severely
+    # limiting risk and flexibility.
     # TODO: The other limiting factor: any parameter containing 'func' is eval()-ed into a function reference;
     # also no other parameter is.
     safe_function_list = ["len"]
