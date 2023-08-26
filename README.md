@@ -43,7 +43,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/ejoosterop/quke">
-    <img src="media/llms.png" alt="Logo" width="240" height="160">
+    <img src="https://github.com/EJOOSTEROP/quke/blob/main/media/llms.png?raw=true" alt="Logo" width="240" height="160">
   </a>
 
 <h3 align="center">quke</h3>
@@ -78,7 +78,7 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>               
+        <li><a href="#installation">Installation</a></li>  
       </ul>
     </li>
     <li>
@@ -110,7 +110,7 @@
 ## About The Project
 Compare the answering capabilities of different LLMs - for example LlaMa, ChatGPT, Cohere, Falcon - against user provided document(s) and questions.
 
-Specify the different models, embedding tools and vector databases in configuration files. 
+Specify the different models, embedding tools and vector databases in configuration files.
 
 Maintain reproducable experiments reflecting combinations of these configurations.
 
@@ -122,7 +122,7 @@ Maintain reproducable experiments reflecting combinations of these configuration
 The instructions assume a Python environment with [Poetry][poetry-url] installed. Development of the tool is done in Python 3.11. While Poetry is not actually needed for the tool to function, the examples assume Poetry is installed.
 
 #### API keys
-The tool uses 3rd party hosted inference APIs. API keys need to be specified as environment variables. 
+The tool uses 3rd party hosted inference APIs. API keys need to be specified as environment variables.
 
 The services used:
 - [HuggingFace][huggingface-url]
@@ -130,29 +130,29 @@ The services used:
 - [Cohere][cohere-url]
 - [Replicate][replicate-url]
 
-The API keys can be specied in a [.env file][.env-url]. Use the provided .env.example file as an example (enter your own API keys and rename it to '.env'). 
+The API keys can be specied in a [.env file][.env-url]. Use the provided .env.example file as an example (enter your own API keys and rename it to '.env').
 
 At present, all services used in the example configuration have free tiers available.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Installation
-Navigate to the directory that contains the pyproject.toml file, then execute the 
+Navigate to the directory that contains the pyproject.toml file, then execute the
 ```sh
 poetry install
-``` 
+```
 command.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
 ## Usage
-For the examples the project comes with a public financial document for a Canadian Bank (CIBC) as source pdf file. 
+For the examples the project comes with a public financial document for a Canadian Bank (CIBC) as source pdf file.
 
 ### Base
 In order to run the first example, ensure to specify your HuggingFace API key.
 
-Use the command 
+Use the command
 ```sh
 poetry run quke
 ```
@@ -167,9 +167,9 @@ The defaults are specified in the config.yaml file (in the ./quke/conf/ director
 ### Specify models and embeddings
 *Ensure to specify your Cohere API key before running.*
 
-As per the configuration files, the default LLM is Falcon and the default embedding uses HuggingFace embedding. 
+As per the configuration files, the default LLM is Falcon and the default embedding uses HuggingFace embedding.
 
-To specify a different LLM - Cohere in this example - run the following: 
+To specify a different LLM - Cohere in this example - run the following:
 ```sh
 poetry run quke embedding=huggingface llm=cohere question=eps
 ```
@@ -192,7 +192,7 @@ poetry run quke embedding=huggingface llm=cohere question=eps
 The LLMs, embeddings, questions and other configurations can be captured in experiment config files. The command
 ```sh
 poetry run quke +experiment=openai
-``` 
+```
 uses an experiment file openai.yaml (see folder ./config/experiments) which specifies the LLM, embedding and questions to be used. It is equivalent to running:
 ```sh
 poetry run quke embedding=openai llm=gpt3-5 question=eps
@@ -227,7 +227,7 @@ Note to set `vectorstore_write_mode` to `append` or `overwrite` in the embedding
 ### Limitations
 The free tiers for the third party services generally come with fairly strict limitations. They differ between services; and may differ over time.
 
- To try out the tool with your own documents it is best to start with a single small source document, no more than two questions and only one combination of LLM/embedding. 
+ To try out the tool with your own documents it is best to start with a single small source document, no more than two questions and only one combination of LLM/embedding.
 
 Error messages due to limitations of the APIs are not always clearly indicated as such.
 
@@ -240,7 +240,7 @@ The tool uses the [LangChain][langchain-url] Python package to interact with the
 
 In general I do not know to what extent any of the data is encrypted during transmission.
 
-The tool shares no information with me. 
+The tool shares no information with me.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -4,8 +4,11 @@
 # especially look at roughly line 51, flake/lint
 import nox
 
+nox.options.sessions = ["black", "ruff"]
+
 
 # TODO: Is this an option: https://nox-poetry.readthedocs.io/en/stable/
+# TODO: or a better option: https://github.com/pdm-project/pdm (instead of Poetry)
 @nox.session
 def flake(session):
     session.install(
@@ -38,11 +41,9 @@ def ruff(session):
 def test(session):
     # Not certain this is a good approach. But it currently works.
     # session.install("pytest")
+    # session.install("pytest-cov")
 
-    if session.posargs:
-        test_files = session.posargs
-    else:
-        test_files = []
+    session.run("pytest", "--cov=quke", "tests/")
 
-    session.run("pytest", *test_files)
-    # session.run("pytest")
+    # test_files = session.posargs if session.posargs else []
+    # session.run("pytest", "--cov=quke", *test_files)
