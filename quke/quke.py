@@ -87,7 +87,6 @@ class ConfigParser:
                 Path(hydra.core.hydra_config.HydraConfig.get()["runtime"]["output_dir"])
                 / cfg.experiment_summary_file
             )
-
         except Exception:
             self.output_file = cfg.experiment_summary_file
 
