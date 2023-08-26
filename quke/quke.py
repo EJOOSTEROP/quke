@@ -162,6 +162,8 @@ def quke(cfg: DictConfig) -> None:
     """The main function to initiate a chat.
 
     Including the embedding of the provided source documents.
+
+    Questions, LLM, embedding model, vectordb are specified in config files (using Hydra).
     """
     console = Console()
     config_parser = ConfigParser(cfg)
