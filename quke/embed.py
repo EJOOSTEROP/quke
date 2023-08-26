@@ -41,6 +41,9 @@ def get_loaders(src_doc_folder: str, loader: DocumentLoaderDef) -> list:
         src_doc_folder: The folder of the source files.
         loader: Definition of the loader. Loaders exist for example for
         pdf, text and csv files.
+
+    Returns:
+        A list of loaders to be used to read the text from source documents.
     """
     ext = loader.ext
 
@@ -133,7 +136,22 @@ def embed(
     splitter_params: dict,
     write_mode: DatabaseAction = DatabaseAction.NO_OVERWRITE,
 ) -> int:
-    """Reads documents from a provided directory, performs embedding and captures the embeddings in a vector store."""
+    """Reads documents from a provided directory, performs embedding and captures the embeddings in a vector store.
+
+    Args:
+        src_doc_folder: Folder containing the source documents.
+        vectordb_location (str): Folder of vector store database.
+        embedding_import: Definition for embedding model.
+        embedding_kwargs: **kwargs to be provided to embedding class.
+        vectordb_import: Definition of vector store.
+        rate_limit: Rate limiting info. Used as a basic limiter dealing with 3rd party API limits.
+        splitter_params: Specifications for text splitting logic.
+        write_mode: Wether to OVERWRITE, APPEND or NO_OVERWRITE the vector store. NO_OVERWRITE will
+        not embed anything if a vector store exists at the vectordb_location.
+
+    Returns:
+        The number of text chunks embedded.
+    """
     logging.info(f"Starting to embed into VectorDB: {vectordb_location}")
 
     # if folder does not exist, or write_mode is APPEND no need to do anything here.
@@ -199,7 +217,18 @@ def embed_these_chunks(
     embedding_kwargs: dict,
     vectordb_import: ClassImportDefinition,
 ) -> int:
-    """Embed the provided chunks and capture into a vector store."""
+    """Embed the provided chunks and capture into a vector store.
+
+    Args:
+        chunks: List of text chunks to be embedded.
+        vectordb_location: Location of the folder containing the embedding database.
+        embedding_import: Definition of embedding model ('to build Python import statement').
+        embedding_kwargs: Dictionary provided as **kwargs for embedding class.
+        vectordb_import: Definition of vector store ('to build Python import statement').
+
+    Returns:
+        Number of chunks embedded and captured in vector store.
+    """
     module = importlib.import_module(embedding_import.module_name)
     class_ = getattr(module, embedding_import.class_name)
     embedding = class_(**embedding_kwargs)
