@@ -27,6 +27,18 @@ def chat(
     Sets up all components required for the chat including the LLM,
     embedding model, vector store, chat memory, retriever and actual
     questions.
+
+    Args:
+        vectordb_location: Folder of vector store.
+        embedding_import: Definition of embedding model.
+        vectordb_import: Definition of vector store.
+        llm_import: Definition of LLM.
+        llm_parameters: dict provided as **kwargs to LLM model class.
+        prompt_parameters: List of questions to ask the LLM.
+        output_file: Folder where result file will be saved.
+
+    Returns:
+        Object containing chat history.
     """
     module = importlib.import_module(embedding_import.module_name)
     class_ = getattr(module, embedding_import.class_name)
@@ -62,12 +74,7 @@ def chat(
     for question in prompt_parameters:
         result = qa({"question": question})
 
-        # print(qa({"question": question}))
-
-        # erik = source_documents
-        # print(f"==============={erik}")
-
-        chat_output(question, result)
+        chat_output(result)
         chat_output_to_file(result, output_file)
 
     logging.info("=======================")
@@ -75,10 +82,15 @@ def chat(
     return qa
 
 
-def chat_output(question: str, result: dict) -> None:
-    """Logs a chat question and anwer."""
+def chat_output(result: dict) -> None:
+    """Logs a chat question and anwer.
+
+    Args:
+        result: dict with the answer from the LLM. Expects 'question', 'answer' and 'source' keys,
+        'page' key optionally.
+    """
     logging.info("=======================")
-    logging.info(f"Q: {question}")
+    logging.info(f"Q: {result['question']}")
     logging.info(f"A: {result['answer']}")
 
     src_docs = [doc.metadata for doc in result["source_documents"]]
@@ -89,7 +101,13 @@ def chat_output(question: str, result: dict) -> None:
 
 # TODO: Either I do not understand mdutils or it is an unfriendly package when trying to append.
 def chat_output_to_file(result: dict, output_file: dict) -> None:
-    """Populates a record of the chat with the LLM into a markdown file."""
+    """Populates a record of the chat with the LLM into a markdown file.
+
+    Args:
+        result: dict with the answer from the LLM. Expects 'question', 'answer' and 'source' keys,
+        'page' key optionally.
+        output_file: File name to which the record is saved.
+    """
     first_write = not Path(output_file["path"]).is_file()
 
     mdFile = MdUtils(file_name="tmp.md")
@@ -124,13 +142,21 @@ def dict_crosstab(source: list, key: str, listed: str, missing: str = "NA") -> d
     """Limited and simple version of a crosstab query on a dict.
 
     Args:
-        source (list): _description_
-        key (str): _description_
-        listed (str): _description_
-        missing (str, optional): _description_. Defaults to "NA".
+        source: List of dicts. Two elements per dict will be considered: 'key' and 'listed'.
+        key: Every dict should contain an entry for 'key'.
+        listed: The key for the element in the dict considered to contain the value.
+        missing: Value to be used if dict has no key for 'listed'.
 
     Returns:
-        _type_: _description_
+        A dictionary containing 'keys' and a list of values for each 'key'.
+
+    >>> a = {'name': 'a', 'number': 2}
+    >>> b = {'name': 'a', 'number': 3, 'number_2': 3}
+    >>> c = {'name': 'a', 'number': 2}
+    >>> d = {'name': 'd', 'number': 1}
+    >>> e = {'name': 'e', 'number_3': 2}
+    >>> dict_crosstab([e, b, c, d, a], 'name', 'number')
+    {'e': ['NA'], 'a': [2, 3], 'd': [1]}
     """
     dict_subs = []
     for d in source:
