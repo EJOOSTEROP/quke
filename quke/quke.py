@@ -92,7 +92,7 @@ class ConfigParser:
 
     def get_embed_params(self) -> dict:
         """Based on the config files returns the set of parameters need to start embedding."""
-        embed_parameters = {
+        return {
             "src_doc_folder": self.src_doc_folder,
             "vectordb_location": self.vectordb_location,
             "embedding_import": self.embedding_import,
@@ -102,11 +102,10 @@ class ConfigParser:
             "splitter_params": self.get_splitter_params(),
             "write_mode": self.write_mode,
         }
-        return embed_parameters
 
     def get_chat_params(self) -> dict:
         """Based on the config files returns the set of parameters need to start a chat."""
-        chat_parameters = {
+        return {
             "vectordb_location": self.vectordb_location,
             "embedding_import": self.embedding_import,
             "vectordb_import": self.vectordb_import,
@@ -115,7 +114,6 @@ class ConfigParser:
             "prompt_parameters": self.questions,
             "output_file": self.get_chat_session_file_parameters(self.cfg),
         }
-        return chat_parameters
 
     def get_splitter_params(self) -> dict:
         """Based on the config files returns the set of parameters needed to split source documents."""
@@ -134,11 +132,10 @@ class ConfigParser:
 
     def get_chat_session_file_parameters(self, cfg: DictConfig) -> dict:
         """Returns the full configuration in a single yaml and file location for output."""
-        chat_sesion_file_parameters = {
+        return {
             "path": self.output_file,
             "conf_yaml": OmegaConf.to_yaml(cfg),
         }
-        return chat_sesion_file_parameters
 
     def get_embedding_kwargs(self, cfg: DictConfig) -> dict:
         """Based on the config files returns the set of parameters needed for embedding."""
