@@ -73,7 +73,7 @@ select = [  # https://beta.ruff.rs/docs/rules/
     "EXE",  # executables
     "F",  # pyflakes
     "FLY",  # f-strings
-    # "G",  # logging format
+    # "G",  # logging format (no f-string)
     "I",  # isort
     "ICN",  # import conventions
     "INT",  # gettext
