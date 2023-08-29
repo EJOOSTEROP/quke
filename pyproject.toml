@@ -57,22 +57,45 @@ line-length = 119
 select = [  # https://beta.ruff.rs/docs/rules/
     "A",  # prevent using keywords that clobber python builtins
     "ANN",  # type annotation
+    "ARG",  # unused arguments
     "B",  # bugbear: security warnings
+    "BLE",  # blind exceptions
     "C",
-    "C90",
+    "COM",  # commas
+    "C4",  # comprehension
+    "C90",  # McCabe complexity
     "D",  # pydocstyle
     # "DAR", # darglint, but does not seem to be implemented at the moment
     "DTZ",  # date timezone
     "E",  # pycodestyle
+    "EM",  # error messages
+    "ERA",  # eradicate
+    "EXE",  # executables
     "F",  # pyflakes
+    "FLY",  # f-strings
+    "G",  # logging format
     "I",  # isort
+    "ICN",  # import conventions
+    "INT",  # gettext
     "ISC",  # implicit string concatenation
+    "N",  # pep8 naming
+    "PERF",  # performance lint
+    "PIE",  #
     "PT",  # pytest style
     "PTH",  # use pathlib
-    "Q",
+    "Q",  # quotes
+    "RET",  # return values
+    "RSE",  # error parenthesis
+    "RUF",  # ruff rules
     "S",  # Bandit
     "SIM",  # simplify
+    "TCH",  # type checking
+    # "TD",  # TODO
+    "TID",  # tidy imports
+    "TRY",  # tryceratops
+    "T20",  # print statement
     "UP",  # alert you when better syntax is available in your python version
+    "W",  # pycodestyle warnings
     "RUF",  # the ruff developer's own rules
 ]
 
