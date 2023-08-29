@@ -47,3 +47,14 @@ def test(session):
 
     # test_files = session.posargs if session.posargs else []
     # session.run("pytest", "--cov=quke", *test_files)
+
+
+@nox.session
+def typing(session):
+    session.install("mypy")
+    session.run(
+        "mypy",
+        "./quke",
+        "--python-executable",
+        "/home/vscode/.cache/pypoetry/virtualenvs/quke-61FoJWY3-py3.11/bin/python",
+    )
