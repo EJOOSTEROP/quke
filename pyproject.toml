@@ -126,6 +126,7 @@ fixable = [
     "PLR2004", # Magic value used in comparison, ...
     "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
     "D",  # no pydocstyle
+    "N",  # Argument, function to lowercase
 ]
 
 "noxfile.py" = [
