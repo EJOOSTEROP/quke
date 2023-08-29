@@ -61,7 +61,7 @@ select = [  # https://beta.ruff.rs/docs/rules/
     "B",  # bugbear: security warnings
     "BLE",  # blind exceptions
     "C",
-    "COM",  # commas
+    # "COM",  # commas
     "C4",  # comprehension
     "C90",  # McCabe complexity
     "D",  # pydocstyle
