@@ -167,7 +167,7 @@ def embed(
                 f"{vectordb_location!r}. Remove database folder, or change embedding config "
                 "vectorstore_write_mode to OVERWRITE or APPEND."
             )
-            return
+            return 0
         if (
             write_mode == DatabaseAction.OVERWRITE
         ):  # remove exising database before embedding
