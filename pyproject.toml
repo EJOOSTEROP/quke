@@ -59,7 +59,7 @@ select = [  # https://beta.ruff.rs/docs/rules/
     "ANN",  # type annotation
     "ARG",  # unused arguments
     "B",  # bugbear: security warnings
-    "BLE",  # blind exceptions
+    # "BLE",  # blind exceptions
     "C",
     # "COM",  # commas
     "C4",  # comprehension
