@@ -54,11 +54,9 @@ def get_loaders(src_doc_folder: str, loader: DocumentLoaderDef) -> list:
 
     # TODO: Problem with embedding more than 2 files at once, or some number of pages/chunks (using HF)?
     # Error message does not really help. Appending in steps does work.
-    loaders = [
+    return [
         loader.loader(str(pdf_name), **loader.kwargs) for pdf_name in src_file_names
     ]
-
-    return loaders
 
 
 def get_pages_from_document(src_doc_folder: str) -> list:
