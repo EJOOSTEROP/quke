@@ -64,7 +64,7 @@ class ConfigParser:
                 (cfg.embedding.vectordb.vectorstore_write_mode).upper()
             ]
         except Exception:
-            logging.warn(
+            logging.warning(
                 f"Invalid value configured for cfg.embedding.vectorstore_write_mode: "
                 f"{cfg.embedding.vectordb.vectorstore_write_mode}. Using no_overwrite instead."
             )
