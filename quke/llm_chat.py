@@ -110,32 +110,32 @@ def chat_output_to_file(result: dict, output_file: dict) -> None:
     """
     first_write = not Path(output_file["path"]).is_file()
 
-    mdFile = MdUtils(file_name="tmp.md")
+    md_file = MdUtils(file_name="tmp.md")
 
     if first_write:
-        mdFile.new_header(1, "LLM Chat Session with quke")
-        mdFile.write(
+        md_file.new_header(1, "LLM Chat Session with quke")
+        md_file.write(
             datetime.now().astimezone().strftime("%a %d-%b-%Y %H:%M %Z"), align="center"
         )
-        mdFile.new_paragraph("")
-        mdFile.new_header(2, "Experiment settings", header_id="settings")
-        mdFile.insert_code(output_file["conf_yaml"], language="yaml")
-        mdFile.new_header(2, "Chat", header_id="chat")
+        md_file.new_paragraph("")
+        md_file.new_header(2, "Experiment settings", header_id="settings")
+        md_file.insert_code(output_file["conf_yaml"], language="yaml")
+        md_file.new_header(2, "Chat", header_id="chat")
     else:
         existing_text = MarkDownFile().read_file(file_name=output_file["path"])
-        mdFile.new_paragraph(existing_text)
+        md_file.new_paragraph(existing_text)
 
-    mdFile.new_paragraph(f"Q: {result['question']}")
-    mdFile.new_paragraph(f"A: {result['answer']}")
+    md_file.new_paragraph(f"Q: {result['question']}")
+    md_file.new_paragraph(f"A: {result['answer']}")
 
     src_docs = [doc.metadata for doc in result["source_documents"]]
     src_docs = dict_crosstab(src_docs, "source", "page")
     for key, value in src_docs.items():
-        mdFile.new_paragraph(f"Source document: {key}, Pages used: {value}")
+        md_file.new_paragraph(f"Source document: {key}, Pages used: {value}")
 
     new = MarkDownFile(name=output_file["path"])
 
-    new.append_end((mdFile.get_md_text()).strip())
+    new.append_end((md_file.get_md_text()).strip())
 
 
 def dict_crosstab(source: list, key: str, listed: str, missing: str = "NA") -> dict:
