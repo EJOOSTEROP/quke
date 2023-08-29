@@ -158,9 +158,7 @@ def dict_crosstab(source: list, key: str, listed: str, missing: str = "NA") -> d
     >>> dict_crosstab([e, b, c, d, a], 'name', 'number')
     {'e': ['NA'], 'a': [2, 3], 'd': [1]}
     """
-    dict_subs = []
-    for d in source:
-        dict_subs.append({key: d[key], listed: d.get(listed, missing)}.values())
+    dict_subs = [{key: d[key], listed: d.get(listed, missing)}.values() for d in source]
 
     d = defaultdict(list)
     for k, v in dict_subs:
