@@ -18,7 +18,7 @@ TEXT_FILE = "test.txt"
 @pytest.fixture(scope="session")
 def GetConfigEmbedOnly():
     with initialize(version_base=None, config_path="./conf"):
-        cfg = compose(
+        return compose(
             config_name="config",
             overrides=[
                 "embed_only=True",
@@ -27,16 +27,14 @@ def GetConfigEmbedOnly():
                 "embedding.vectordb.vectorstore_write_mode=overwrite",
             ],
         )
-    return cfg
 
 
 @pytest.fixture(scope="session")
 def GetConfigLLMOnly(tmp_path_factory: pytest.TempPathFactory):
     folder = tmp_path_factory.mktemp("output")
-    # output_file = os.path.join(folder, OUTPUT_FILE)
     output_file = Path(folder) / OUTPUT_FILE
     with initialize(version_base=None, config_path="./conf"):
-        cfg = compose(
+        return compose(
             config_name="config",
             overrides=[
                 "embed_only=False",
@@ -45,7 +43,6 @@ def GetConfigLLMOnly(tmp_path_factory: pytest.TempPathFactory):
                 "embedding.vectordb.vectorstore_write_mode=no_overwrite",
             ],
         )
-    return cfg
 
 
 @pytest.fixture(scope="session")
