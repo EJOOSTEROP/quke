@@ -7,6 +7,7 @@ import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Iterator
 
 # [ ] TODO: PyMU is faster, PyPDF more accurate: https://github.com/py-pdf/benchmarks
 from langchain.document_loaders import CSVLoader, PyMuPDFLoader, TextLoader
@@ -20,7 +21,10 @@ class DocumentLoaderDef:
 
     ext: str = "pdf"
     loader: object = PyMuPDFLoader
-    kwargs: defaultdict[dict] = field(default_factory=dict)  # empty dict
+    # TODO: Remove this - kwargs: defaultdict[dict] = field(default_factory=dict)  # empty dict
+    kwargs: dict[str, str] = field(
+        default_factory=lambda: defaultdict(dict)
+    )  # empty dict
 
 
 DOC_LOADERS = [
@@ -187,7 +191,7 @@ def embed(
     )
 
     # Use chunker to embed in chunks with a wait time in between. As a basic way to deal with some rate limiting.
-    def chunker(seq: list, size: int) -> list:
+    def chunker(seq: list, size: int) -> Iterator[list]:
         return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
     c = 0
