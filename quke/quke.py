@@ -124,11 +124,13 @@ class ConfigParser:
 
     def get_args_dict(self, cfg_sub: dict) -> dict:
         """Takes a subset of the Hydra configs and returns the same as a dict."""
-        return OmegaConf.to_container(cfg_sub, resolve=True)
+        res = OmegaConf.to_container(cfg_sub, resolve=True)
+        return res if isinstance(res, dict) else {}
 
     def get_llm_parameters(self) -> dict:
         """Based on the config files returns the set of parameters needed to setup an LLM."""
-        return OmegaConf.to_container(self.cfg.llm.llm_args, resolve=True)
+        res = OmegaConf.to_container(self.cfg.llm.llm_args, resolve=True)
+        return res if isinstance(res, dict) else {}
 
     def get_chat_session_file_parameters(self, cfg: DictConfig) -> dict:
         """Returns the full configuration in a single yaml and file location for output."""
@@ -143,12 +145,6 @@ class ConfigParser:
             embedding_kwargs = (
                 cfg.embedding.embedding.kwargs if cfg.embedding.embedding.kwargs else {}
             )
-            """
-            if cfg.embedding.embedding.kwargs:
-                embedding_kwargs = cfg.embedding.embedding.kwargs
-            else:
-                embedding_kwargs = {}
-            """
         except Exception:
             embedding_kwargs = {}
         return embedding_kwargs
