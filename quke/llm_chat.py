@@ -129,8 +129,8 @@ def chat_output_to_file(result: dict, output_file: dict) -> None:
     md_file.new_paragraph(f"A: {result['answer']}")
 
     src_docs = [doc.metadata for doc in result["source_documents"]]
-    src_docs = dict_crosstab(src_docs, "source", "page")
-    for key, value in src_docs.items():
+    src_docs_pages_used = dict_crosstab(src_docs, "source", "page")
+    for key, value in src_docs_pages_used.items():
         md_file.new_paragraph(f"Source document: {key}, Pages used: {value}")
 
     new = MarkDownFile(name=output_file["path"])
