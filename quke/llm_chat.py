@@ -7,8 +7,8 @@ from pathlib import Path
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
-from mdutils.fileutils import MarkDownFile
-from mdutils.mdutils import MdUtils
+from mdutils.fileutils import MarkDownFile  # type: ignore
+from mdutils.mdutils import MdUtils  # type: ignore
 
 from . import ClassImportDefinition
 
