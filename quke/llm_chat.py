@@ -94,8 +94,8 @@ def chat_output(result: dict) -> None:
     logging.info(f"A: {result['answer']}")
 
     src_docs = [doc.metadata for doc in result["source_documents"]]
-    src_docs = dict_crosstab(src_docs, "source", "page")
-    for key, value in src_docs.items():
+    src_docs_pages_used = dict_crosstab(src_docs, "source", "page")
+    for key, value in src_docs_pages_used.items():
         logging.info(f"Source document: {key}, Pages used: {value}")
 
 

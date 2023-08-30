@@ -136,3 +136,6 @@ fixable = [
 
 [tool.ruff.pydocstyle]
 convention = "google"
+
+[tool.mypy]
+disallow_incomplete_defs = true
