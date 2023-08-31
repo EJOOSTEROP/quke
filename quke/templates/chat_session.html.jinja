@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>LLM Chat Session with quke</title>
+
+</head>
+<body>
+    <h1>LLM Chat Session with quke</h1>
+    <div>{{ chat_time }}</div>
+    <h1>Experiment Settings</h1>
+    <pre>
+        <code>{{ config }}</code>
+    </pre>
+    <h1>Chat</h1>
+    {% for result in llm_results %}
+        <div>Q: <strong>{{ result.question }}</strong></div>
+        <div>A: {{ result.answer }}</div>
+        <br>
+        <div>Source: </div>
+        <div>
+            {% for key, value in dict_crosstab(result.source_documents).items() %}
+            {{ key }}, pages: {{ value }}
+            {% endfor %}
+        </div>
+        <div><br></div>
+    {% endfor %}
+</body>
+
+{# 1) timestamp 2) conf summary 3) chat: [question, answer, source (optional)] #}
+</html>

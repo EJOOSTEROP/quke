@@ -4,11 +4,11 @@ import logging  # functionality managed by Hydra
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
+from typing import Literal
 
+from jinja2 import Environment, PackageLoader, select_autoescape
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
-from mdutils.fileutils import MarkDownFile  # type: ignore
-from mdutils.mdutils import MdUtils  # type: ignore
 
 from . import ClassImportDefinition
 
@@ -71,71 +71,72 @@ def chat(
 
     # NOTE: trial API keys may have very restrictive rules. It is plausible that you run into
     # constraints after the 2nd question.
-    for question in prompt_parameters:
-        result = qa({"question": question})
 
-        chat_output(result)
-        chat_output_to_file(result, output_file)
+    results = [qa({"question": question}) for question in prompt_parameters]
+    chat_output_to_html(
+        results, output_file
+    )  # TODO: infer output from output file name in cfg?
+    chat_output_to_html(results, output_file, output_extension=".md")
+    chat_output_to_html(results, output_file, output_extension="logging")
 
     logging.info("=======================")
 
     return qa
 
 
-def chat_output(result: dict) -> None:
-    """Logs a chat question and anwer.
+def chat_output_to_html(
+    results: list[dict],
+    output_file: dict,
+    output_extension: Literal[".html", ".md", "logging"] = ".html",
+) -> None:
+    """Write summary of chat experiment into HTML file.
 
     Args:
-        result: dict with the answer from the LLM. Expects 'question', 'answer' and 'source' keys,
-        'page' key optionally.
+        results: list of dicts with the answer from the LLM. Expects 'question', 'answer'
+        and 'source' keys; 'page' key optionally.
+        output_file: path and other information regarding the output file.
+        output_extension: .html or .md. Alteratively logging for python logging.
     """
-    logging.info("=======================")
-    logging.info(f"Q: {result['question']}")
-    logging.info(f"A: {result['answer']}")
+    env = Environment(loader=PackageLoader("quke"), autoescape=select_autoescape())
 
-    src_docs = [doc.metadata for doc in result["source_documents"]]
-    src_docs_pages_used = dict_crosstab(src_docs, "source", "page")
-    for key, value in src_docs_pages_used.items():
-        logging.info(f"Source document: {key}, Pages used: {value}")
-
-
-# TODO: Either I do not understand mdutils or it is an unfriendly package when trying to append.
-def chat_output_to_file(result: dict, output_file: dict) -> None:
-    """Populates a record of the chat with the LLM into a markdown file.
-
-    Args:
-        result: dict with the answer from the LLM. Expects 'question', 'answer' and 'source' keys,
-        'page' key optionally.
-        output_file: File name to which the record is saved.
-    """
-    first_write = not Path(output_file["path"]).is_file()
-
-    md_file = MdUtils(file_name="tmp.md")
-
-    if first_write:
-        md_file.new_header(1, "LLM Chat Session with quke")
-        md_file.write(
-            datetime.now().astimezone().strftime("%a %d-%b-%Y %H:%M %Z"), align="center"
-        )
-        md_file.new_paragraph("")
-        md_file.new_header(2, "Experiment settings", header_id="settings")
-        md_file.insert_code(output_file["conf_yaml"], language="yaml")
-        md_file.new_header(2, "Chat", header_id="chat")
+    if output_extension.lower() == ".html":
+        template_name = "chat_session.html.jinja"
+    elif output_extension.lower() == ".md":
+        template_name = "chat_session.md.jinja"
+    elif output_extension.lower() == "logging":
+        template_name = "chat_session.logging.jinja"
     else:
-        existing_text = MarkDownFile().read_file(file_name=output_file["path"])
-        md_file.new_paragraph(existing_text)
+        template_name = "chat_session.html.jinja"
 
-    md_file.new_paragraph(f"Q: {result['question']}")
-    md_file.new_paragraph(f"A: {result['answer']}")
+    template = env.get_template(template_name)
+    func_dict = {"dict_crosstab": _dict_crosstab_for_jinja}
+    template.globals.update(func_dict)
 
-    src_docs = [doc.metadata for doc in result["source_documents"]]
-    src_docs_pages_used = dict_crosstab(src_docs, "source", "page")
-    for key, value in src_docs_pages_used.items():
-        md_file.new_paragraph(f"Source document: {key}, Pages used: {value}")
+    output = template.render(
+        chat_time=datetime.now().astimezone().strftime("%a %d-%b-%Y %H:%M %Z"),
+        llm_results=results,
+        config=output_file["conf_yaml"],
+    )
 
-    new = MarkDownFile(name=output_file["path"])
+    if output_extension.lower() == "logging":
+        logging.info(output)
+    else:
+        file_path = Path(output_file["path"]).with_suffix(output_extension)
+        with file_path.open("w") as fp:
+            fp.write(output)
 
-    new.append_end((md_file.get_md_text()).strip())
+
+def _dict_crosstab_for_jinja(sources: list) -> dict:
+    """Wrapper around dict_crostab for use from within Jinja.
+
+    Args:
+        sources (list): _description_
+
+    Returns:
+        dict: _description_
+    """
+    src_docs = [doc.metadata for doc in sources]
+    return dict_crosstab(src_docs, "source", "page")
 
 
 def dict_crosstab(source: list, key: str, listed: str, missing: str = "NA") -> dict:
