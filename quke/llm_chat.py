@@ -9,8 +9,6 @@ from typing import Literal
 from jinja2 import Environment, PackageLoader, select_autoescape
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
-from mdutils.fileutils import MarkDownFile  # type: ignore
-from mdutils.mdutils import MdUtils  # type: ignore
 
 from . import ClassImportDefinition
 
@@ -73,11 +71,6 @@ def chat(
 
     # NOTE: trial API keys may have very restrictive rules. It is plausible that you run into
     # constraints after the 2nd question.
-    # for question in prompt_parameters:
-    #     result = qa({"question": question})  # noqa
-
-    #     chat_output(result)  # noqa
-    #     chat_output_to_file(result, output_file)  # noqa
 
     results = [qa({"question": question}) for question in prompt_parameters]
     chat_output_to_html(results, output_file)
@@ -86,62 +79,6 @@ def chat(
     logging.info("=======================")
 
     return qa
-
-
-def chat_output(result: dict) -> None:
-    """Logs a chat question and anwer.
-
-    Args:
-        result: dict with the answer from the LLM. Expects 'question', 'answer' and 'source' keys,
-        'page' key optionally.
-    """
-    logging.info("=======================")
-    logging.info(f"Q: {result['question']}")
-    logging.info(f"A: {result['answer']}")
-
-    src_docs = [doc.metadata for doc in result["source_documents"]]
-    src_docs_pages_used = dict_crosstab(src_docs, "source", "page")
-    for key, value in src_docs_pages_used.items():
-        logging.info(f"Source document: {key}, Pages used: {value}")
-
-
-# TODO: Either I do not understand mdutils or it is an unfriendly package when trying to append.
-def chat_output_to_file(result: dict, output_file: dict) -> None:
-    """Populates a record of the chat with the LLM into a markdown file.
-
-    Args:
-        result: dict with the answer from the LLM. Expects 'question', 'answer' and 'source' keys,
-        'page' key optionally.
-        output_file: File name to which the record is saved.
-    """
-    first_write = not Path(output_file["path"]).is_file()
-
-    md_file = MdUtils(file_name="tmp.md")
-
-    if first_write:
-        md_file.new_header(1, "LLM Chat Session with quke")
-        md_file.write(
-            datetime.now().astimezone().strftime("%a %d-%b-%Y %H:%M %Z"), align="center"
-        )
-        md_file.new_paragraph("")
-        md_file.new_header(2, "Experiment settings", header_id="settings")
-        md_file.insert_code(output_file["conf_yaml"], language="yaml")
-        md_file.new_header(2, "Chat", header_id="chat")
-    else:
-        existing_text = MarkDownFile().read_file(file_name=output_file["path"])
-        md_file.new_paragraph(existing_text)
-
-    md_file.new_paragraph(f"Q: {result['question']}")
-    md_file.new_paragraph(f"A: {result['answer']}")
-
-    src_docs = [doc.metadata for doc in result["source_documents"]]
-    src_docs_pages_used = dict_crosstab(src_docs, "source", "page")
-    for key, value in src_docs_pages_used.items():
-        md_file.new_paragraph(f"Source document: {key}, Pages used: {value}")
-
-    new = MarkDownFile(name=output_file["path"])
-
-    new.append_end((md_file.get_md_text()).strip())
 
 
 def chat_output_to_html(
