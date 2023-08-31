@@ -2,22 +2,28 @@
 <html lang="en">
 
 <head>
-    <title><strong>LLM Chat Session with quke</strong></title>
-    <div>{{ chat_time }}</div>
+    <title>LLM Chat Session with quke</title>
+
 </head>
 <body>
-    <h1><strong>Experiment Settings</strong></h1>
+    <h1>LLM Chat Session with quke</h1>
+    <div>{{ chat_time }}</div>
+    <h1>Experiment Settings</h1>
     <pre>
         <code>{{ config }}</code>
     </pre>
-    <h1></strong>Chat</strong></h1>
+    <h1>Chat</h1>
     {% for result in llm_results %}
         <div>Q: <strong>{{ result.question }}</strong></div>
         <div>A: {{ result.answer }}</div>
-        <div>Source docs: </div>>
+        <br>
+        <div>Source: </div>
+        <div>
             {% for key, value in dict_crosstab(result.source_documents).items() %}
-            {{ key }}: {{ value }}
+            document: {{ key }}, page: {{ value }}
             {% endfor %}
+        </div>
+        <div><br></div>
     {% endfor %}
 </body>
 

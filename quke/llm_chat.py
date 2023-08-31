@@ -154,13 +154,17 @@ def chat_output_to_html(results: list[dict], output_file: dict) -> None:
     template = env.get_template("chat_session.html.jinja")
     func_dict = {"dict_crosstab": _dict_crosstab_for_jinja}
     template.globals.update(func_dict)
-    print(  # noqa
-        template.render(
-            chat_time=datetime.now().astimezone().strftime("%a %d-%b-%Y %H:%M %Z"),
-            llm_results=results,
-            config=output_file["conf_yaml"],
-        )
+
+    output = template.render(
+        chat_time=datetime.now().astimezone().strftime("%a %d-%b-%Y %H:%M %Z"),
+        llm_results=results,
+        config=output_file["conf_yaml"],
     )
+
+    file_path = Path(output_file["path"]).with_suffix(".html")
+
+    with file_path.open("w") as fp:
+        fp.write(output)
 
 
 def _dict_crosstab_for_jinja(sources: list) -> dict:
