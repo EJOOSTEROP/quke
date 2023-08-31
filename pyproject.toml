@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "quke"
-version = "0.2.1"
+version = "0.3.0"
 description = "Compare the answering capabilities of different LLMs - for example LlaMa, ChatGPT, Cohere, Falcon - against user provided document(s) and questions."
 authors = ["Erik Oosterop"]
 maintainers = ["Erik Oosterop"]
