@@ -1,0 +1,22 @@
+# LLM Chat Session with quke
+<center>{{ chat_time }}</center>
+
+## Experiment settings
+
+```yaml
+{{ config }}
+```
+
+## Chat
+
+{% for result in llm_results %}
+Q: {{ result.question }}
+
+A: {{ result.answer }}
+
+Source: {% for key, value in dict_crosstab(result.source_documents).items() %}
+{{ key }}, pages: {{ value }}
+{% endfor %}
+-------
+
+{% endfor %}

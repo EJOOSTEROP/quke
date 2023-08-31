@@ -73,7 +73,10 @@ def chat(
     # constraints after the 2nd question.
 
     results = [qa({"question": question}) for question in prompt_parameters]
-    chat_output_to_html(results, output_file)
+    chat_output_to_html(
+        results, output_file
+    )  # TODO: infer output from output file name in cfg?
+    chat_output_to_html(results, output_file, output_extension=".md")
     chat_output_to_html(results, output_file, output_extension="logging")
 
     logging.info("=======================")
