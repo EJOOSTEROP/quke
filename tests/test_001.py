@@ -108,7 +108,10 @@ def test_chat(GetConfigLLMOnly: DictConfig):
 
     chat_result = chat(**ConfigParser(GetConfigLLMOnly).get_chat_params())
     assert isinstance(chat_result, ConversationalRetrievalChain)
-    assert Path(ConfigParser(GetConfigLLMOnly).output_file).is_file()
+    assert (
+        Path(ConfigParser(GetConfigLLMOnly).output_file).with_suffix(".html").is_file()
+        or Path(ConfigParser(GetConfigLLMOnly).output_file).with_suffix(".md").is_file()
+    )
 
 
 def test_crosstab_dict(GetCrossTabDicts: list):
