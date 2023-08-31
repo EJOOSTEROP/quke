@@ -166,7 +166,7 @@ def quke(cfg: DictConfig) -> None:
     with console.status("Embedding...", spinner="aesthetic"):
         # python -m rich.spinner to see options
         embed.embed(**embed_parameters)
-        logging.info("\n" + OmegaConf.to_yaml(cfg))
+        # Used to log config here: logging.info("\n" + OmegaConf.to_yaml(cfg))
 
     if not config_parser.embed_only:
         with console.status("Chatting...", spinner="aesthetic"):
