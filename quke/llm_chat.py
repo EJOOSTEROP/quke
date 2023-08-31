@@ -5,6 +5,7 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+from jinja2 import Environment, PackageLoader, select_autoescape
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from mdutils.fileutils import MarkDownFile  # type: ignore
@@ -71,11 +72,14 @@ def chat(
 
     # NOTE: trial API keys may have very restrictive rules. It is plausible that you run into
     # constraints after the 2nd question.
-    for question in prompt_parameters:
-        result = qa({"question": question})
+    # for question in prompt_parameters:
+    #     result = qa({"question": question})  # noqa
 
-        chat_output(result)
-        chat_output_to_file(result, output_file)
+    #     chat_output(result)  # noqa
+    #     chat_output_to_file(result, output_file)  # noqa
+
+    results = [qa({"question": question}) for question in prompt_parameters]
+    chat_output_to_html(results, output_file)
 
     logging.info("=======================")
 
@@ -136,6 +140,40 @@ def chat_output_to_file(result: dict, output_file: dict) -> None:
     new = MarkDownFile(name=output_file["path"])
 
     new.append_end((md_file.get_md_text()).strip())
+
+
+def chat_output_to_html(results: list[dict], output_file: dict) -> None:
+    """Write summary of chat experiment into HTML file.
+
+    Args:
+        results: list of dicts with the answer from the LLM. Expects 'question', 'answer'
+        and 'source' keys; 'page' key optionally.
+        output_file: path and other information regarding the output file.
+    """
+    env = Environment(loader=PackageLoader("quke"), autoescape=select_autoescape())
+    template = env.get_template("chat_session.html.jinja")
+    func_dict = {"dict_crosstab": _dict_crosstab_for_jinja}
+    template.globals.update(func_dict)
+    print(  # noqa
+        template.render(
+            chat_time=datetime.now().astimezone().strftime("%a %d-%b-%Y %H:%M %Z"),
+            llm_results=results,
+            config=output_file["conf_yaml"],
+        )
+    )
+
+
+def _dict_crosstab_for_jinja(sources: list) -> dict:
+    """Wrapper around dict_crostab for use from within Jinja.
+
+    Args:
+        sources (list): _description_
+
+    Returns:
+        dict: _description_
+    """
+    src_docs = [doc.metadata for doc in sources]
+    return dict_crosstab(src_docs, "source", "page")
 
 
 def dict_crosstab(source: list, key: str, listed: str, missing: str = "NA") -> dict:
