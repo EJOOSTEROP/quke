@@ -6,7 +6,7 @@ from hydra import compose, initialize
 from omegaconf import DictConfig
 
 from quke.embed import embed, get_chunks_from_pages, get_pages_from_document
-from quke.llm_chat import chat
+from quke.llm_chat import chat, dict_crosstab
 from quke.quke import ConfigParser
 
 OUTPUT_FILE = "chat_session.md"
@@ -18,7 +18,7 @@ TEXT_FILE = "test.txt"
 @pytest.fixture(scope="session")
 def GetConfigEmbedOnly():
     with initialize(version_base=None, config_path="./conf"):
-        cfg = compose(
+        return compose(
             config_name="config",
             overrides=[
                 "embed_only=True",
@@ -27,16 +27,14 @@ def GetConfigEmbedOnly():
                 "embedding.vectordb.vectorstore_write_mode=overwrite",
             ],
         )
-    return cfg
 
 
 @pytest.fixture(scope="session")
 def GetConfigLLMOnly(tmp_path_factory: pytest.TempPathFactory):
     folder = tmp_path_factory.mktemp("output")
-    # output_file = os.path.join(folder, OUTPUT_FILE)
     output_file = Path(folder) / OUTPUT_FILE
     with initialize(version_base=None, config_path="./conf"):
-        cfg = compose(
+        return compose(
             config_name="config",
             overrides=[
                 "embed_only=False",
@@ -45,7 +43,6 @@ def GetConfigLLMOnly(tmp_path_factory: pytest.TempPathFactory):
                 "embedding.vectordb.vectorstore_write_mode=no_overwrite",
             ],
         )
-    return cfg
 
 
 @pytest.fixture(scope="session")
@@ -58,6 +55,17 @@ def GetChunks(GetPages: list, GetConfigEmbedOnly: DictConfig) -> list:
     return get_chunks_from_pages(
         GetPages, ConfigParser(GetConfigEmbedOnly).get_splitter_params()
     )
+
+
+@pytest.fixture(scope="session")
+def GetCrossTabDicts() -> list:
+    a = {"name": "a", "number": 2}
+    b = {"name": "a", "number": 3, "number_2": 3}
+    c = {"name": "a", "number": 2}
+    d = {"name": "d", "number": 1}
+    e = {"name": "e", "number_3": 2}
+
+    return [e, b, c, d, a]
 
 
 def test_documentloader(GetPages: list):
@@ -101,3 +109,8 @@ def test_chat(GetConfigLLMOnly: DictConfig):
     chat_result = chat(**ConfigParser(GetConfigLLMOnly).get_chat_params())
     assert isinstance(chat_result, ConversationalRetrievalChain)
     assert Path(ConfigParser(GetConfigLLMOnly).output_file).is_file()
+
+
+def test_crosstab_dict(GetCrossTabDicts: list):
+    x_result = dict_crosstab(GetCrossTabDicts, "name", "number")
+    assert x_result == {"e": ["NA"], "a": [2, 3], "d": [1]}

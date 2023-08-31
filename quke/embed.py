@@ -7,6 +7,7 @@ import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Iterator
 
 # [ ] TODO: PyMU is faster, PyPDF more accurate: https://github.com/py-pdf/benchmarks
 from langchain.document_loaders import CSVLoader, PyMuPDFLoader, TextLoader
@@ -20,7 +21,10 @@ class DocumentLoaderDef:
 
     ext: str = "pdf"
     loader: object = PyMuPDFLoader
-    kwargs: defaultdict[dict] = field(default_factory=dict)  # empty dict
+    # TODO: Remove this - kwargs: defaultdict[dict] = field(default_factory=dict)  # empty dict
+    kwargs: dict[str, str] = field(
+        default_factory=lambda: defaultdict(dict)
+    )  # empty dict
 
 
 DOC_LOADERS = [
@@ -41,6 +45,9 @@ def get_loaders(src_doc_folder: str, loader: DocumentLoaderDef) -> list:
         src_doc_folder: The folder of the source files.
         loader: Definition of the loader. Loaders exist for example for
         pdf, text and csv files.
+
+    Returns:
+        A list of loaders to be used to read the text from source documents.
     """
     ext = loader.ext
 
@@ -51,15 +58,20 @@ def get_loaders(src_doc_folder: str, loader: DocumentLoaderDef) -> list:
 
     # TODO: Problem with embedding more than 2 files at once, or some number of pages/chunks (using HF)?
     # Error message does not really help. Appending in steps does work.
-    loaders = [
+    return [
         loader.loader(str(pdf_name), **loader.kwargs) for pdf_name in src_file_names
     ]
 
-    return loaders
-
 
 def get_pages_from_document(src_doc_folder: str) -> list:
-    """Reads documents from the directory/folder provided and returns a list of pages and metadata."""
+    """Reads documents from the directory/folder provided and returns a list of pages and metadata.
+
+    Args:
+        src_doc_folder: Folder containing the source documents.
+
+    Returns:
+        List containing one page per list item, as text.
+    """
     pages = []
     for docloader in DOC_LOADERS:
         for loader in get_loaders(src_doc_folder, docloader):
@@ -79,9 +91,20 @@ def get_pages_from_document(src_doc_folder: str) -> list:
 
 
 def get_chunks_from_pages(pages: list, splitter_params: dict) -> list:
-    """Splits pages into smaller chunks used for embedding."""
-    # for splitter args containing 'func', the yaml value is converted into a Python function.
-    # TODO: Security risk? Hence a safe_list of functions is provided; severly limiting flexibility.
+    """Splits pages into smaller chunks used for embedding.
+
+    Args:
+        pages: List with page text of a document(s).
+        splitter_params: Dictionary with settings for splitting logic, having
+        keys splitter_args and splitter_import.
+        splitter_args are provided to the splitter function as **kwargs. Note that if a keyword
+        contains 'func' the value will be evaluated as a python function (only 'len' allowed).
+
+    Returns:
+        A list of smaller text chunks from the pages. In a next step to be used for embedding.
+    """
+    # TODO: eval() is a security risk. Hence a safe_list of functions is provided; severely
+    # limiting risk and flexibility.
     # TODO: The other limiting factor: any parameter containing 'func' is eval()-ed into a function reference;
     # also no other parameter is.
     safe_function_list = ["len"]
@@ -115,7 +138,22 @@ def embed(
     splitter_params: dict,
     write_mode: DatabaseAction = DatabaseAction.NO_OVERWRITE,
 ) -> int:
-    """Reads documents from a provided directory, performs embedding and captures the embeddings in a vector store."""
+    """Reads documents from a provided directory, performs embedding and captures the embeddings in a vector store.
+
+    Args:
+        src_doc_folder: Folder containing the source documents.
+        vectordb_location (str): Folder of vector store database.
+        embedding_import: Definition for embedding model.
+        embedding_kwargs: **kwargs to be provided to embedding class.
+        vectordb_import: Definition of vector store.
+        rate_limit: Rate limiting info. Used as a basic limiter dealing with 3rd party API limits.
+        splitter_params: Specifications for text splitting logic.
+        write_mode: Wether to OVERWRITE, APPEND or NO_OVERWRITE the vector store. NO_OVERWRITE will
+        not embed anything if a vector store exists at the vectordb_location.
+
+    Returns:
+        The number of text chunks embedded.
+    """
     logging.info(f"Starting to embed into VectorDB: {vectordb_location}")
 
     # if folder does not exist, or write_mode is APPEND no need to do anything here.
@@ -131,7 +169,7 @@ def embed(
                 f"{vectordb_location!r}. Remove database folder, or change embedding config "
                 "vectorstore_write_mode to OVERWRITE or APPEND."
             )
-            return
+            return 0
         if (
             write_mode == DatabaseAction.OVERWRITE
         ):  # remove exising database before embedding
@@ -153,7 +191,7 @@ def embed(
     )
 
     # Use chunker to embed in chunks with a wait time in between. As a basic way to deal with some rate limiting.
-    def chunker(seq: list, size: int) -> list:
+    def chunker(seq: list, size: int) -> Iterator[list]:
         return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
     c = 0
@@ -181,7 +219,18 @@ def embed_these_chunks(
     embedding_kwargs: dict,
     vectordb_import: ClassImportDefinition,
 ) -> int:
-    """Embed the provided chunks and capture into a vector store."""
+    """Embed the provided chunks and capture into a vector store.
+
+    Args:
+        chunks: List of text chunks to be embedded.
+        vectordb_location: Location of the folder containing the embedding database.
+        embedding_import: Definition of embedding model ('to build Python import statement').
+        embedding_kwargs: Dictionary provided as **kwargs for embedding class.
+        vectordb_import: Definition of vector store ('to build Python import statement').
+
+    Returns:
+        Number of chunks embedded and captured in vector store.
+    """
     module = importlib.import_module(embedding_import.module_name)
     class_ = getattr(module, embedding_import.class_name)
     embedding = class_(**embedding_kwargs)
