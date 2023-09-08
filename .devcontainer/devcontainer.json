@@ -38,7 +38,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "pip3 install --user -r requirements.txt",
-	"postCreateCommand": "poetry install && pre-commit install" ,
+	"postCreateCommand": "poetry install && git config --global --add safe.directory ${containerWorkspaceFolder} && pre-commit install" ,
 	// "postCreateCommand": "poetry install" ,
 
 	// Configure tool-specific properties.
