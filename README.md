@@ -134,6 +134,9 @@ The API keys can be specied in a [.env file][.env-url]. Use the provided .env.ex
 
 At present, all services used in the example configuration have free tiers available.
 
+#### sqlite3
+sqlite3 v3.35 or higher is required. This is oftentimes installed as part of a Linux install.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Installation
