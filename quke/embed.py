@@ -243,8 +243,6 @@ def embed_these_chunks(
         documents=chunks, embedding=embedding, persist_directory=vectordb_location
     )
 
-    # vectordb.persist()
-
     logging.info(f"{len(chunks)} chunks persisted into database at {vectordb_location}")
 
     return len(chunks)
