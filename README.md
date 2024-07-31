@@ -198,7 +198,7 @@ poetry run quke +experiment=openai
 ```
 uses an experiment file openai.yaml (see folder ./config/experiments) which specifies the LLM, embedding and questions to be used. It is equivalent to running:
 ```sh
-poetry run quke embedding=openai llm=gpt3-5 question=eps
+poetry run quke embedding=openai llm=gpt4o question=eps
 ```
 Multiple experiments can be run at once as follows:
 
@@ -256,6 +256,7 @@ The tool shares no information with me.
 * [![OpenAI][openai.com]][openai-url]
 * [![Replicate][replicate.com]][replicate-url]
 <br></br>
+
 * [![Hydra][hydra.com]][hydra-url]
 * [![LangChain][langchain.com]][langchain-url]
 

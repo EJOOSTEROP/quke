@@ -6,7 +6,7 @@ embed_only: False
 
 defaults:
   - _self_
-  - llm: falcon7b
+  - llm: cohere
   - embedding: huggingface
   - question: eps
 

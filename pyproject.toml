@@ -6,9 +6,9 @@ authors = ["Erik Oosterop"]
 maintainers = ["Erik Oosterop"]
 license = "MIT"
 readme = "README.md"
-homepage = ""
+homepage = "https://github.com/EJOOSTEROP/quke"
 repository = "https://github.com/EJOOSTEROP/quke"
-documentation = ""
+documentation = "https://github.com/EJOOSTEROP/quke"
 keywords = ["ML", "LLM", "compare", "chat", "semantic search"]
 
 
