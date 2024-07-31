@@ -13,7 +13,7 @@ vectordb:
 embedding:
   module_name: langchain_cohere
   class_name: CohereEmbeddings
-  kwargs: #optional
+  kwargs:
     model: embed-english-light-v3.0
   rate_limit_chunks: 300 # max about 200 when I trialed (free account). Must depend on many considerations.
   rate_limit_delay: 60 # in seconds
