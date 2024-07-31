@@ -1,0 +1,7 @@
+module_name_llm: langchain_google_genai
+class_name_llm: ChatGoogleGenerativeAI
+name: gemini-1.5-pro
+
+llm_args:
+  model: ${llm.name}
+  temperature: 0

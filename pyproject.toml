@@ -31,6 +31,7 @@ sentence-transformers = "^3.0.1"
 langchain-huggingface = "^0.0.3"
 langchain-cohere = "^0.1.9"
 replicate = "^0.30.1"
+langchain-google-genai = "^1.0.8"
 
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^4.1.0"
