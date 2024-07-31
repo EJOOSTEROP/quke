@@ -11,10 +11,10 @@ vectordb:
   vectorstore_write_mode: no_overwrite
 
 embedding:
-  module_name: langchain.embeddings
+  module_name: langchain_cohere
   class_name: CohereEmbeddings
   kwargs: #optional
-#    repo_id: sentence-transformers/all-mpnet-base-v2
+    model: embed-english-light-v3.0
   rate_limit_chunks: 300 # max about 200 when I trialed (free account). Must depend on many considerations.
   rate_limit_delay: 60 # in seconds
 

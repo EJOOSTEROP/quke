@@ -14,7 +14,7 @@ embedding:
   module_name: langchain_openai
   class_name: OpenAIEmbeddings
   kwargs: #optional
-#    repo_id: sentence-transformers/all-mpnet-base-v2
+    model: text-embedding-3-large
   rate_limit_chunks: 200 # max about 200 when I trialed (free account). Must depend on many considerations.
   rate_limit_delay: 60 # in seconds
 
