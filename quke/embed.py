@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Iterator
 
 # [ ] TODO: PyMU is faster, PyPDF more accurate: https://github.com/py-pdf/benchmarks
-from langchain.document_loaders import CSVLoader, PyMuPDFLoader, TextLoader
+from langchain_community.document_loaders import CSVLoader, PyMuPDFLoader, TextLoader
 
 from . import ClassImportDefinition, ClassRateLimit, DatabaseAction
 
