@@ -19,7 +19,7 @@ embedding:
   rate_limit_delay: 60 # in seconds
 
 splitter:
-  module_name: langchain.text_splitter
+  module_name: langchain_text_splitters
   class_name: CharacterTextSplitter
   args:
     chunk_size: 1000
