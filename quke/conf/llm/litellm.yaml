@@ -1,6 +1,7 @@
 module_name_llm: langchain_community.chat_models
 class_name_llm: ChatLiteLLM
-name: anthropic/claude-3-5-sonnet-20240620
+#name: anthropic/claude-3-5-sonnet-20240620
+name: anthropic/claude-3
 
 llm_args:
   model_name: ${llm.name}
