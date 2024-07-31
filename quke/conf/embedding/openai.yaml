@@ -11,7 +11,7 @@ vectordb:
   vectorstore_write_mode: overwrite
 
 embedding:
-  module_name: langchain.embeddings
+  module_name: langchain_openai
   class_name: OpenAIEmbeddings
   kwargs: #optional
 #    repo_id: sentence-transformers/all-mpnet-base-v2
