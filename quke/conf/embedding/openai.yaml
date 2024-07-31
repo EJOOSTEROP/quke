@@ -8,7 +8,7 @@ vectordb:
   # -If the folder exists and 'no_overwrite' is specified: document will not be embedded
   # -If the folder exists and 'overwrite' is specified, all contents of the vectordb folder will be deleted and a new vectordb will be created.
   # -If set to 'append' the new embeddings will be appended to any existing vectordb. If a source document is specified twice it will be embedded twice.
-  vectorstore_write_mode: overwrite
+  vectorstore_write_mode: no_overwrite
 
 embedding:
   module_name: langchain_openai

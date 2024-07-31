@@ -12,7 +12,7 @@ vectordb:
 
 embedding:
   module_name: langchain_huggingface.embeddings
-  class_name: HuggingFaceHubEmbeddings
+  class_name: HuggingFaceEmbeddings
   kwargs: #optional
 #    repo_id: sentence-transformers/all-mpnet-base-v2
   rate_limit_chunks: 201 # max about 200 when I trialed (free account). Must depend on many considerations.
