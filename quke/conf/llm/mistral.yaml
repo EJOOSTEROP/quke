@@ -1,0 +1,8 @@
+module_name_llm: langchain_mistralai.chat_models
+class_name_llm: ChatMistralAI
+name: mistral-large-latest
+# mistral-large-2407
+
+llm_args:
+  model: ${llm.name}
+  temperature: 0

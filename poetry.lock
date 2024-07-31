@@ -1662,6 +1662,23 @@ tokenizers = ">=0.19.1"
 transformers = ">=4.39.0"
 
 [[package]]
+name = "langchain-mistralai"
+version = "0.1.11"
+description = "An integration package connecting Mistral and LangChain"
+optional = false
+python-versions = "<4.0,>=3.8.1"
+files = [
+    {file = "langchain_mistralai-0.1.11-py3-none-any.whl", hash = "sha256:2473c304aca2d8c5bdf9dda0e9b4f2ea3f50eebc74c9322b7f61e11da08be080"},
+    {file = "langchain_mistralai-0.1.11.tar.gz", hash = "sha256:092ea667f9d4a869ac9470d67bd1db36bb41531a526fc81a7d2672972ac908d8"},
+]
+
+[package.dependencies]
+httpx = ">=0.25.2,<1"
+httpx-sse = ">=0.3.1,<1"
+langchain-core = ">=0.2.24,<0.3"
+tokenizers = ">=0.15.1,<1"
+
+[[package]]
 name = "langchain-openai"
 version = "0.1.19"
 description = "An integration package connecting OpenAI and LangChain"
@@ -4798,4 +4815,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "20f01b5586e7a6bae5656ea0f5f73043db4dd44f97f4aba9b3ae18cc829dc715"
+content-hash = "010b274a473be61f13fc6707f665aa7a55e5659053694dcc2bbdca9d7e3e50a1"
