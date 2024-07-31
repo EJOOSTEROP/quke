@@ -18,7 +18,6 @@ quke = "quke.quke:quke"
 [tool.poetry.dependencies]
 python = "^3.11"
 lark = "^1.1.7"
-replicate = "^0.9.0"
 rich = "^13.5.2"
 pymupdf = "^1.24.9"
 langchain-community = "^0.2.10"
@@ -31,6 +30,7 @@ langchain-openai = "^0.1.19"
 sentence-transformers = "^3.0.1"
 langchain-huggingface = "^0.0.3"
 langchain-cohere = "^0.1.9"
+replicate = "^0.30.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^4.1.0"
