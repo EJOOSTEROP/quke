@@ -7,13 +7,16 @@ from pathlib import Path
 from typing import Literal
 
 from jinja2 import Environment, PackageLoader, select_autoescape
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import ConversationalRetrievalChain, create_history_aware_retriever, create_retrieval_chain
 from langchain.memory import ConversationBufferMemory
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.prompts import ChatPromptTemplate
 
-from . import ClassImportDefinition
+
+from quke import ClassImportDefinition
 
 
-def chat(
+def chat_orig(
     vectordb_location: str,
     embedding_import: ClassImportDefinition,
     vectordb_import: ClassImportDefinition,
@@ -82,6 +85,111 @@ def chat(
     logging.info("=======================")
 
     return qa
+
+
+def chat(
+    vectordb_location: str,
+    embedding_import: ClassImportDefinition,
+    vectordb_import: ClassImportDefinition,
+    llm_import: ClassImportDefinition,
+    llm_parameters: dict,
+    prompt_parameters: dict,
+    output_file: dict,
+) -> object:
+    """Initiates a chat with an LLM.
+
+    Sets up all components required for the chat including the LLM,
+    embedding model, vector store, chat memory, retriever and actual
+    questions.
+
+    Args:
+        vectordb_location: Folder of vector store.
+        embedding_import: Definition of embedding model.
+        vectordb_import: Definition of vector store.
+        llm_import: Definition of LLM.
+        llm_parameters: dict provided as **kwargs to LLM model class.
+        prompt_parameters: List of questions to ask the LLM.
+        output_file: Folder where result file will be saved.
+
+    Returns:
+        Object containing chat history.
+    """
+    module = importlib.import_module(embedding_import.module_name)
+    class_ = getattr(module, embedding_import.class_name)
+    embedding = class_()
+
+    logging.warning(
+        "CAUTION: This function uses external compute services "
+        "(like OpenAI or HuggingFace). This is likely to cost money."
+    )
+    module = importlib.import_module(vectordb_import.module_name)
+    class_ = getattr(module, vectordb_import.class_name)
+    vectordb = class_(embedding_function=embedding, persist_directory=vectordb_location)
+
+    module = importlib.import_module(llm_import.module_name)
+    class_ = getattr(module, llm_import.class_name)
+    llm = class_(**llm_parameters)
+
+    condense_question_system_template = (
+        "Given a chat history and the latest user question "
+        "which might reference context in the chat history, "
+        "formulate a standalone question which can be understood "
+        "without the chat history. Do NOT answer the question, "
+        "just reformulate it if needed and otherwise return it as is."
+    )
+
+    condense_question_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", condense_question_system_template),
+            ("placeholder", "{chat_history}"),
+            ("human", "{input}"),
+        ]
+    )
+    history_aware_retriever = create_history_aware_retriever(
+        llm, vectordb.as_retriever(), condense_question_prompt
+    )
+
+    system_prompt = (
+        "You are an assistant for question-answering tasks. "
+        "Use the following pieces of retrieved context to answer "
+        "the question. If you don't know the answer, say that you "
+        "don't know. Use three sentences maximum and keep the "
+        "answer concise."
+        "\n\n"
+        "{context}"
+    )
+
+    qa_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", system_prompt),
+            ("placeholder", "{chat_history}"),
+            ("human", "{input}"),
+        ]
+    )
+    qa_chain = create_stuff_documents_chain(llm, qa_prompt)
+
+    convo_qa_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
+
+    # NOTE: trial API keys may have very restrictive rules. It is plausible that you run into
+    # constraints after the 2nd question.
+
+    results = [convo_qa_chain.invoke(
+        {
+            "input": question,
+            "chat_history": [],
+        }
+    ) for question in prompt_parameters]
+
+    # results = [qa({"question": question}) for question in prompt_parameters]
+    chat_output_to_html(
+        results, output_file
+    )  # TODO: infer output from output file name in cfg?
+    chat_output_to_html(results, output_file, output_extension=".md")
+    chat_output_to_html(results, output_file, output_extension="logging")
+
+    logging.info("=======================")
+
+    return results
 
 
 def chat_output_to_html(
