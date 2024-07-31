@@ -1,5 +1,5 @@
 vectordb:
-  module_name: langchain.vectorstores
+  module_name: langchain_chroma
   class_name: Chroma
   vectorstore_location: vector_store/chromadb_hf_recursive
 
