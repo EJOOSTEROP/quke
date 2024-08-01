@@ -2,6 +2,7 @@
 
 LLMs, embedding model, vector store and other components can be congfigured.
 """
+
 import logging  # functionality managed by Hydra
 from pathlib import Path
 
@@ -11,7 +12,7 @@ from hydra.utils import to_absolute_path
 from omegaconf import DictConfig, OmegaConf
 from rich.console import Console
 
-from . import ClassImportDefinition, ClassRateLimit, DatabaseAction, embed, llm_chat
+from quke import ClassImportDefinition, ClassRateLimit, DatabaseAction, embed, llm_chat
 
 _ = load_dotenv(find_dotenv())
 
