@@ -8,13 +8,14 @@ vectordb:
   # -If the folder exists and 'no_overwrite' is specified: document will not be embedded
   # -If the folder exists and 'overwrite' is specified, all contents of the vectordb folder will be deleted and a new vectordb will be created.
   # -If set to 'append' the new embeddings will be appended to any existing vectordb. If a source document is specified twice it will be embedded twice.
-  vectorstore_write_mode: no_overwrite
+  vectorstore_write_mode: overwrite
 
 embedding:
   module_name: langchain_cohere
   class_name: CohereEmbeddings
   kwargs:
     model: embed-english-light-v3.0
+    # model: embed-english-v3.0
   rate_limit_chunks: 300 # max about 200 when I trialed (free account). Must depend on many considerations.
   rate_limit_delay: 60 # in seconds
 

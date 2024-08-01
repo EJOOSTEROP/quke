@@ -16,7 +16,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from quke import ClassImportDefinition
 
 
-def chat_orig(
+def chat_old(
     vectordb_location: str,
     embedding_import: ClassImportDefinition,
     vectordb_import: ClassImportDefinition,
