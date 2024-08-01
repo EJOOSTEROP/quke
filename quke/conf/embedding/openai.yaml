@@ -8,14 +8,13 @@ vectordb:
   # -If the folder exists and 'no_overwrite' is specified: document will not be embedded
   # -If the folder exists and 'overwrite' is specified, all contents of the vectordb folder will be deleted and a new vectordb will be created.
   # -If set to 'append' the new embeddings will be appended to any existing vectordb. If a source document is specified twice it will be embedded twice.
-  vectorstore_write_mode: overwrite
+  vectorstore_write_mode: no_overwrite
 
 embedding:
   module_name: langchain_openai
   class_name: OpenAIEmbeddings
   kwargs: #optional
-    model: text-embedding-3-large
-    #dimensions: 1536
+    # model: text-embedding-3-large
   rate_limit_chunks: 200 # max about 200 when I trialed (free account). Must depend on many considerations.
   rate_limit_delay: 60 # in seconds
 
