@@ -7,84 +7,12 @@ from pathlib import Path
 from typing import Literal
 
 from jinja2 import Environment, PackageLoader, select_autoescape
-from langchain.chains import ConversationalRetrievalChain, create_history_aware_retriever, create_retrieval_chain
-from langchain.memory import ConversationBufferMemory
+from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 
 
 from quke import ClassImportDefinition
-
-
-def chat_old(
-    vectordb_location: str,
-    embedding_import: ClassImportDefinition,
-    vectordb_import: ClassImportDefinition,
-    llm_import: ClassImportDefinition,
-    llm_parameters: dict,
-    prompt_parameters: dict,
-    output_file: dict,
-) -> object:
-    """Initiates a chat with an LLM.
-
-    Sets up all components required for the chat including the LLM,
-    embedding model, vector store, chat memory, retriever and actual
-    questions.
-
-    Args:
-        vectordb_location: Folder of vector store.
-        embedding_import: Definition of embedding model.
-        vectordb_import: Definition of vector store.
-        llm_import: Definition of LLM.
-        llm_parameters: dict provided as **kwargs to LLM model class.
-        prompt_parameters: List of questions to ask the LLM.
-        output_file: Folder where result file will be saved.
-
-    Returns:
-        Object containing chat history.
-    """
-    module = importlib.import_module(embedding_import.module_name)
-    class_ = getattr(module, embedding_import.class_name)
-    embedding = class_()
-
-    logging.warning(
-        "CAUTION: This function uses external compute services "
-        "(like OpenAI or HuggingFace). This is likely to cost money."
-    )
-    module = importlib.import_module(vectordb_import.module_name)
-    class_ = getattr(module, vectordb_import.class_name)
-    vectordb = class_(embedding_function=embedding, persist_directory=vectordb_location)
-
-    module = importlib.import_module(llm_import.module_name)
-    class_ = getattr(module, llm_import.class_name)
-    llm = class_(**llm_parameters)
-
-    memory = ConversationBufferMemory(
-        memory_key="chat_history",
-        return_messages=True,
-        output_key="answer",
-    )
-
-    qa = ConversationalRetrievalChain.from_llm(
-        llm,
-        retriever=vectordb.as_retriever(),
-        memory=memory,
-        return_source_documents=True,
-    )
-
-    # NOTE: trial API keys may have very restrictive rules. It is plausible that you run into
-    # constraints after the 2nd question.
-
-    results = [qa({"question": question}) for question in prompt_parameters]
-    chat_output_to_html(
-        results, output_file
-    )  # TODO: infer output from output file name in cfg?
-    chat_output_to_html(results, output_file, output_extension=".md")
-    chat_output_to_html(results, output_file, output_extension="logging")
-
-    logging.info("=======================")
-
-    return qa
 
 
 def chat(
