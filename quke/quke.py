@@ -116,12 +116,10 @@ class ConfigParser:
             logging.warning(
                 "Rate limiter specified in llm config file cannot be found in config.yaml."
             )
-            raise NotImplementedError(
-                "Rate limiter specified in llm config file cannot be found in config.yaml."
-            )
+            # raise NotImplementedError(
+            #     "Rate limiter specified in llm config file cannot be found in config.yaml."
+            # )
 
-        print(rate_limiter_config)
-        # raise NotImplementedError("Rate limiter found but aborting anyhow.")
         return rate_limiter_config
 
     def get_rate_limiter_kwargs_old(self) -> dict:
