@@ -122,61 +122,6 @@ class ConfigParser:
 
         return rate_limiter_config
 
-    def get_rate_limiter_kwargs_old(self) -> dict:
-        """Based on the config files returns the set of parameters needed to setup a rate limiter."""
-        if not self.llm_rate_limiter_name:
-            raise NotImplementedError("No rate limiter specified in config file.")
-            return {}
-
-        def find_index_given_dict_key(list, key: str) -> int:
-            """
-            Find the index of the first occurrence of a given key in a list of dictionaries.
-
-            Args:
-                list (list): A list of dictionaries.
-                key (str): The key to search for in the dictionaries.
-
-            Returns:
-                int: The index of the first occurrence of the key in the list, or -1 if the key is not found.
-            """
-            for i, d in enumerate(list):
-                if key in d:
-                    return i
-            return -1
-
-        existing_limiters = OmegaConf.to_container(
-            self.cfg.rate_limiters,
-            resolve=True,
-        )
-
-        limiter_index = find_index_given_dict_key(
-            existing_limiters, self.llm_rate_limiter_name
-        )
-
-        if limiter_index != -1:
-            res = OmegaConf.to_container(
-                self.cfg.rate_limiters[limiter_index][self.llm_rate_limiter_name],
-                resolve=True,
-            )
-        else:
-            logging.warning(
-                "Rate limiter specified in llm config file cannot be found in config.yaml."
-            )
-            raise NotImplementedError(
-                "Rate limiter specified in llm config file cannot be found in config.yaml."
-            )
-            return {}
-
-        # res = dict(res[rate_limiter_name])
-        print(res)
-        # print(type(res[rate_limiter_name]))
-        # print(res[rate_limiter_name])
-        print("Done")
-        # print(self.cfg.rate_limiters[limiter_index]["openai"])
-        raise NotImplementedError
-
-        return res if isinstance(res, dict) else {}
-
     def get_embed_params(self) -> dict:
         """Based on the config files returns the set of parameters need to start embedding."""
         return {
