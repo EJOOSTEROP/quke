@@ -58,6 +58,11 @@ def chat(
     class_ = getattr(module, llm_import.class_name)
     llm = class_(**llm_parameters)
 
+    if llm_parameters.get("rate_limiter") is not None:
+        logging.info("Rate limiter used by LLM.")
+    else:
+        logging.info("No rate limiter used by LLM.")
+
     condense_question_system_template = (
         "Given a chat history and the latest user question "
         "which might reference context in the chat history, "

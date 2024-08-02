@@ -92,14 +92,12 @@ class ConfigParser:
         except Exception:
             self.output_file = cfg.experiment_summary_file
 
-        # self.llm_rate_limiter_name = "openai"
         self.llm_rate_limiter_name = getattr(cfg.llm, "rate_limiter", None)
 
     def get_rate_limiter_kwargs(self) -> dict:
         """Based on the config files returns the set of parameters needed to setup a rate limiter."""
         if not self.llm_rate_limiter_name:
-            # raise NotImplementedError("No rate limiter specified in config file.")
-            logging.info("No rate_limiter specified in llm config file.")
+            logging.info("No rate_limiter used as none specified in llm config file.")
             return {}
 
         rate_limiters = OmegaConf.to_container(self.cfg.rate_limiters, resolve=True)
@@ -114,11 +112,9 @@ class ConfigParser:
             ]
         else:
             logging.warning(
-                "Rate limiter specified in llm config file cannot be found in config.yaml."
+                f"No rate_limiter used as the rate limiter specified in llm config file ({self.llm_rate_limiter_name}) cannot be found in config.yaml."
             )
-            # raise NotImplementedError(
-            #     "Rate limiter specified in llm config file cannot be found in config.yaml."
-            # )
+            rate_limiter_config = {}
 
         return rate_limiter_config
 
@@ -211,8 +207,6 @@ def quke(cfg: DictConfig) -> None:
     config_parser = ConfigParser(cfg)
 
     embed_parameters = config_parser.get_embed_params()
-
-    print(f"RATE_LIMITER: '{config_parser.get_rate_limiter_kwargs()}'")
 
     with console.status("Embedding...", spinner="aesthetic"):
         # python -m rich.spinner to see options
