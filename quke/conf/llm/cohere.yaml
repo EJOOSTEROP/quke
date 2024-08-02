@@ -4,7 +4,7 @@ class_name_llm: ChatCohere
 name: command-r-plus
 
 # rate_limiter is optional. If it exists it needs to refer to a limiter defined in config.yaml.
-rate_limiter: openai
+rate_limiter: cohere
 
 llm_args:
   model: ${llm.name}

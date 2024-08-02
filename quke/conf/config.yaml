@@ -10,10 +10,10 @@ rate_limiters:
       requests_per_second: 0.03
       check_every_n_seconds: 10
   - openai:
-      requests_per_second: 0.03
+      requests_per_second: 8
       check_every_n_seconds: 5
   - cohere:
-      requests_per_second: 0.03
+      requests_per_second: 0.1
 
 defaults:
   - _self_

@@ -2,6 +2,9 @@ module_name_llm: langchain_openai
 class_name_llm: ChatOpenAI
 name: gpt-4o-mini
 
+# rate_limiter is optional. If it exists it needs to refer to a limiter defined in config.yaml.
+rate_limiter: openai
+
 llm_args:
   model_name: ${llm.name}
   temperature: 0
