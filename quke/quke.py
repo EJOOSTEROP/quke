@@ -2,6 +2,7 @@
 
 LLMs, embedding model, vector store and other components can be congfigured.
 """
+
 import logging  # functionality managed by Hydra
 from pathlib import Path
 
@@ -11,7 +12,8 @@ from hydra.utils import to_absolute_path
 from omegaconf import DictConfig, OmegaConf
 from rich.console import Console
 
-from . import ClassImportDefinition, ClassRateLimit, DatabaseAction, embed, llm_chat
+from quke import ClassImportDefinition, ClassRateLimit, DatabaseAction, embed, llm_chat
+from quke import rate_limiter as qrate_limiter
 
 _ = load_dotenv(find_dotenv())
 
@@ -90,6 +92,32 @@ class ConfigParser:
         except Exception:
             self.output_file = cfg.experiment_summary_file
 
+        self.llm_rate_limiter_name = getattr(cfg.llm, "rate_limiter", None)
+
+    def get_rate_limiter_kwargs(self) -> dict:
+        """Based on the config files returns the set of parameters needed to setup a rate limiter."""
+        if not self.llm_rate_limiter_name:
+            logging.info("No rate_limiter used as none specified in llm config file.")
+            return {}
+
+        rate_limiters = OmegaConf.to_container(self.cfg.rate_limiters, resolve=True)
+        limiter_index = next(
+            (i for i, d in enumerate(rate_limiters) if self.llm_rate_limiter_name in d),
+            -1,
+        )
+
+        if limiter_index != -1:
+            rate_limiter_config = rate_limiters[limiter_index][
+                self.llm_rate_limiter_name
+            ]
+        else:
+            logging.warning(
+                f"No rate_limiter used as the rate limiter specified in llm config file ({self.llm_rate_limiter_name}) cannot be found in config.yaml."
+            )
+            rate_limiter_config = {}
+
+        return rate_limiter_config
+
     def get_embed_params(self) -> dict:
         """Based on the config files returns the set of parameters need to start embedding."""
         return {
@@ -127,9 +155,26 @@ class ConfigParser:
         res = OmegaConf.to_container(cfg_sub, resolve=True)
         return res if isinstance(res, dict) else {}
 
+    def create_rate_limiter(self) -> qrate_limiter.InMemoryRateLimiter:
+        """Create a new rate limiter and add it to the global dictionary."""
+        limiter_kwargs = self.get_rate_limiter_kwargs()
+
+        if limiter_kwargs:
+            rate_limiter = qrate_limiter.get_rate_limiter(
+                self.llm_rate_limiter_name, **limiter_kwargs
+            )
+            return rate_limiter
+
+        return None
+
     def get_llm_parameters(self) -> dict:
         """Based on the config files returns the set of parameters needed to setup an LLM."""
         res = OmegaConf.to_container(self.cfg.llm.llm_args, resolve=True)
+
+        rate_limiter = self.create_rate_limiter()
+        if rate_limiter:
+            res["rate_limiter"] = rate_limiter
+
         return res if isinstance(res, dict) else {}
 
     def get_chat_session_file_parameters(self, cfg: DictConfig) -> dict:

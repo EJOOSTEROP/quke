@@ -1,4 +1,5 @@
 """Sets up all elements required for a chat session."""
+
 import importlib
 import logging  # functionality managed by Hydra
 from collections import defaultdict
@@ -7,10 +8,11 @@ from pathlib import Path
 from typing import Literal
 
 from jinja2 import Environment, PackageLoader, select_autoescape
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
+from langchain.chains import create_history_aware_retriever, create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.prompts import ChatPromptTemplate
 
-from . import ClassImportDefinition
+from quke import ClassImportDefinition
 
 
 def chat(
@@ -56,23 +58,65 @@ def chat(
     class_ = getattr(module, llm_import.class_name)
     llm = class_(**llm_parameters)
 
-    memory = ConversationBufferMemory(
-        memory_key="chat_history",
-        return_messages=True,
-        output_key="answer",
+    if llm_parameters.get("rate_limiter") is not None:
+        logging.info("Rate limiter used by LLM.")
+    else:
+        logging.info("No rate limiter used by LLM.")
+
+    condense_question_system_template = (
+        "Given a chat history and the latest user question "
+        "which might reference context in the chat history, "
+        "formulate a standalone question which can be understood "
+        "without the chat history. Do NOT answer the question, "
+        "just reformulate it if needed and otherwise return it as is."
     )
 
-    qa = ConversationalRetrievalChain.from_llm(
-        llm,
-        retriever=vectordb.as_retriever(),
-        memory=memory,
-        return_source_documents=True,
+    condense_question_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", condense_question_system_template),
+            ("placeholder", "{chat_history}"),
+            ("human", "{input}"),
+        ]
     )
+    history_aware_retriever = create_history_aware_retriever(
+        llm, vectordb.as_retriever(), condense_question_prompt
+    )
+
+    system_prompt = (
+        "You are an assistant for question-answering tasks. "
+        "Use the following pieces of retrieved context to answer "
+        "the question. If you don't know the answer, say that you "
+        "don't know. Use three sentences maximum and keep the "
+        "answer concise."
+        "\n\n"
+        "{context}"
+    )
+
+    qa_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", system_prompt),
+            ("placeholder", "{chat_history}"),
+            ("human", "{input}"),
+        ]
+    )
+    qa_chain = create_stuff_documents_chain(llm, qa_prompt)
+
+    convo_qa_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
 
     # NOTE: trial API keys may have very restrictive rules. It is plausible that you run into
     # constraints after the 2nd question.
 
-    results = [qa({"question": question}) for question in prompt_parameters]
+    results = [
+        convo_qa_chain.invoke(
+            {
+                "input": question,
+                "chat_history": [],
+            }
+        )
+        for question in prompt_parameters
+    ]
+
+    # results = [qa({"question": question}) for question in prompt_parameters]
     chat_output_to_html(
         results, output_file
     )  # TODO: infer output from output file name in cfg?
@@ -81,7 +125,7 @@ def chat(
 
     logging.info("=======================")
 
-    return qa
+    return results
 
 
 def chat_output_to_html(

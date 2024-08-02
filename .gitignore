@@ -174,3 +174,4 @@ DEL_setup.py
 readme - SAMPLE.md
 quke/temp.yaml
 quke/wip.py
+.aider*

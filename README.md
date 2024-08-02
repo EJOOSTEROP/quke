@@ -49,7 +49,7 @@
 <h3 align="center">quke</h3>
 
   <p align="center">
-    Compare the answering capabilities of different LLMs - for example LlaMa, ChatGPT, Cohere, Falcon - against user provided document(s) and questions.
+    Compare the answering capabilities of different LLMs - for example LlaMa, GPT4o, Mistral, Claude, Cohere, others - against user provided document(s) and questions.
     <br />
     <a href="https://github.com/ejoosterop/quke"><strong>Explore the docs »</strong></a>
     <br />

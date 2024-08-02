@@ -1,5 +1,5 @@
 vectordb:
-  module_name: langchain.vectorstores
+  module_name: langchain_chroma
   class_name: Chroma
   vectorstore_location: vector_store/chromadb_openai
 
@@ -8,18 +8,18 @@ vectordb:
   # -If the folder exists and 'no_overwrite' is specified: document will not be embedded
   # -If the folder exists and 'overwrite' is specified, all contents of the vectordb folder will be deleted and a new vectordb will be created.
   # -If set to 'append' the new embeddings will be appended to any existing vectordb. If a source document is specified twice it will be embedded twice.
-  vectorstore_write_mode: overwrite
+  vectorstore_write_mode: no_overwrite
 
 embedding:
-  module_name: langchain.embeddings
+  module_name: langchain_openai
   class_name: OpenAIEmbeddings
   kwargs: #optional
-#    repo_id: sentence-transformers/all-mpnet-base-v2
+    # model: text-embedding-3-large
   rate_limit_chunks: 200 # max about 200 when I trialed (free account). Must depend on many considerations.
   rate_limit_delay: 60 # in seconds
 
 splitter:
-  module_name: langchain.text_splitter
+  module_name: langchain_text_splitters
   class_name: CharacterTextSplitter
   args:
     chunk_size: 1000

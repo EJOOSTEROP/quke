@@ -10,9 +10,9 @@ from pathlib import Path
 from typing import Iterator
 
 # [ ] TODO: PyMU is faster, PyPDF more accurate: https://github.com/py-pdf/benchmarks
-from langchain.document_loaders import CSVLoader, PyMuPDFLoader, TextLoader
+from langchain_community.document_loaders import CSVLoader, PyMuPDFLoader, TextLoader
 
-from . import ClassImportDefinition, ClassRateLimit, DatabaseAction
+from quke import ClassImportDefinition, ClassRateLimit, DatabaseAction
 
 
 @dataclass
@@ -239,11 +239,9 @@ def embed_these_chunks(
     class_ = getattr(module, vectordb_import.class_name)
     vectordb_type = class_()
 
-    vectordb = vectordb_type.from_documents(
+    _ = vectordb_type.from_documents(
         documents=chunks, embedding=embedding, persist_directory=vectordb_location
     )
-
-    vectordb.persist()
 
     logging.info(f"{len(chunks)} chunks persisted into database at {vectordb_location}")
 

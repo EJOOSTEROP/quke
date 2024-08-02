@@ -3,6 +3,6 @@
 {% for result in llm_results %}
 Q: {{ result.question }}
 A: {{ result.answer }}
-Source: {% for key, value in dict_crosstab(result.source_documents).items() %}
+Source: {% for key, value in dict_crosstab(result.context).items() %}
     document: {{ key }}, page: {{ value }} {% endfor %}
 {% endfor %}=======================

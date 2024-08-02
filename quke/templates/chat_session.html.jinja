@@ -19,7 +19,7 @@
         <br>
         <div>Source: </div>
         <div>
-            {% for key, value in dict_crosstab(result.source_documents).items() %}
+            {% for key, value in dict_crosstab(result.context).items() %}
             {{ key }}, pages: {{ value }}
             {% endfor %}
         </div>

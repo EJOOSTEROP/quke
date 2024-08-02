@@ -1,0 +1,11 @@
+module_name_llm: langchain_mistralai.chat_models
+class_name_llm: ChatMistralAI
+name: mistral-large-latest
+# mistral-large-2407
+
+# rate_limiter is optional. If it exists it needs to refer to a limiter defined in config.yaml.
+rate_limiter: none
+
+llm_args:
+  model: ${llm.name}
+  temperature: 0
