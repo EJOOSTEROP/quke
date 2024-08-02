@@ -4,6 +4,14 @@ experiment_summary_file: 'chat_session.md'
 
 embed_only: False
 
+# The parameters refer to langchain_core.rate_limiters.InMemoryRateLimiter
+rate_limiters:
+  - openai:
+      requests_per_second: 0.03
+      check_every_n_seconds: 5
+  - cohere:
+      requests_per_second: 0.03
+
 defaults:
   - _self_
   - llm: cohere

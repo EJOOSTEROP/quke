@@ -13,6 +13,7 @@ from omegaconf import DictConfig, OmegaConf
 from rich.console import Console
 
 from quke import ClassImportDefinition, ClassRateLimit, DatabaseAction, embed, llm_chat
+from quke import rate_limiter as qrate_limiter
 
 _ = load_dotenv(find_dotenv())
 
@@ -91,6 +92,93 @@ class ConfigParser:
         except Exception:
             self.output_file = cfg.experiment_summary_file
 
+        # self.llm_rate_limiter_name = "openai"
+        self.llm_rate_limiter_name = getattr(cfg.llm, "rate_limiter", None)
+
+    def get_rate_limiter_kwargs(self) -> dict:
+        """Based on the config files returns the set of parameters needed to setup a rate limiter."""
+        if not self.llm_rate_limiter_name:
+            # raise NotImplementedError("No rate limiter specified in config file.")
+            logging.info("No rate_limiter specified in llm config file.")
+            return {}
+
+        rate_limiters = OmegaConf.to_container(self.cfg.rate_limiters, resolve=True)
+        limiter_index = next(
+            (i for i, d in enumerate(rate_limiters) if self.llm_rate_limiter_name in d),
+            -1,
+        )
+
+        if limiter_index != -1:
+            rate_limiter_config = rate_limiters[limiter_index][
+                self.llm_rate_limiter_name
+            ]
+        else:
+            logging.warning(
+                "Rate limiter specified in llm config file cannot be found in config.yaml."
+            )
+            raise NotImplementedError(
+                "Rate limiter specified in llm config file cannot be found in config.yaml."
+            )
+
+        print(rate_limiter_config)
+        # raise NotImplementedError("Rate limiter found but aborting anyhow.")
+        return rate_limiter_config
+
+    def get_rate_limiter_kwargs_old(self) -> dict:
+        """Based on the config files returns the set of parameters needed to setup a rate limiter."""
+        if not self.llm_rate_limiter_name:
+            raise NotImplementedError("No rate limiter specified in config file.")
+            return {}
+
+        def find_index_given_dict_key(list, key: str) -> int:
+            """
+            Find the index of the first occurrence of a given key in a list of dictionaries.
+
+            Args:
+                list (list): A list of dictionaries.
+                key (str): The key to search for in the dictionaries.
+
+            Returns:
+                int: The index of the first occurrence of the key in the list, or -1 if the key is not found.
+            """
+            for i, d in enumerate(list):
+                if key in d:
+                    return i
+            return -1
+
+        existing_limiters = OmegaConf.to_container(
+            self.cfg.rate_limiters,
+            resolve=True,
+        )
+
+        limiter_index = find_index_given_dict_key(
+            existing_limiters, self.llm_rate_limiter_name
+        )
+
+        if limiter_index != -1:
+            res = OmegaConf.to_container(
+                self.cfg.rate_limiters[limiter_index][self.llm_rate_limiter_name],
+                resolve=True,
+            )
+        else:
+            logging.warning(
+                "Rate limiter specified in llm config file cannot be found in config.yaml."
+            )
+            raise NotImplementedError(
+                "Rate limiter specified in llm config file cannot be found in config.yaml."
+            )
+            return {}
+
+        # res = dict(res[rate_limiter_name])
+        print(res)
+        # print(type(res[rate_limiter_name]))
+        # print(res[rate_limiter_name])
+        print("Done")
+        # print(self.cfg.rate_limiters[limiter_index]["openai"])
+        raise NotImplementedError
+
+        return res if isinstance(res, dict) else {}
+
     def get_embed_params(self) -> dict:
         """Based on the config files returns the set of parameters need to start embedding."""
         return {
@@ -128,9 +216,26 @@ class ConfigParser:
         res = OmegaConf.to_container(cfg_sub, resolve=True)
         return res if isinstance(res, dict) else {}
 
+    def create_rate_limiter(self) -> qrate_limiter.InMemoryRateLimiter:
+        """Create a new rate limiter and add it to the global dictionary."""
+        limiter_kwargs = self.get_rate_limiter_kwargs()
+
+        if limiter_kwargs:
+            rate_limiter = qrate_limiter.get_rate_limiter(
+                self.llm_rate_limiter_name, **limiter_kwargs
+            )
+            return rate_limiter
+
+        return None
+
     def get_llm_parameters(self) -> dict:
         """Based on the config files returns the set of parameters needed to setup an LLM."""
         res = OmegaConf.to_container(self.cfg.llm.llm_args, resolve=True)
+
+        rate_limiter = self.create_rate_limiter()
+        if rate_limiter:
+            res["rate_limiter"] = rate_limiter
+
         return res if isinstance(res, dict) else {}
 
     def get_chat_session_file_parameters(self, cfg: DictConfig) -> dict:
@@ -163,6 +268,8 @@ def quke(cfg: DictConfig) -> None:
     config_parser = ConfigParser(cfg)
 
     embed_parameters = config_parser.get_embed_params()
+
+    print(f"RATE_LIMITER: '{config_parser.get_rate_limiter_kwargs()}'")
 
     with console.status("Embedding...", spinner="aesthetic"):
         # python -m rich.spinner to see options

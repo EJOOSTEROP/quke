@@ -3,6 +3,9 @@ class_name_llm: ChatCohere
 #name: command-nightly
 name: command-r-plus
 
+# rate_limiter is optional. If it exists it needs to refer to a limiter defined in config.yaml.
+rate_limiter: openaivvv
+
 llm_args:
   model: ${llm.name}
   temperature: 0
