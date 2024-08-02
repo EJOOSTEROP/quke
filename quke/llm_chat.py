@@ -1,4 +1,5 @@
 """Sets up all elements required for a chat session."""
+
 import importlib
 import logging  # functionality managed by Hydra
 from collections import defaultdict
@@ -11,8 +12,8 @@ from langchain.chains import create_history_aware_retriever, create_retrieval_ch
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 
-
 from quke import ClassImportDefinition
+from quke import rate_limiter as qrate_limiter
 
 
 def chat(
@@ -54,6 +55,9 @@ def chat(
     class_ = getattr(module, vectordb_import.class_name)
     vectordb = class_(embedding_function=embedding, persist_directory=vectordb_location)
 
+    llm_parameters["rate_limiter"] = qrate_limiter.get_rate_limiter(
+        "openai", requests_per_second=0.03
+    )
     module = importlib.import_module(llm_import.module_name)
     class_ = getattr(module, llm_import.class_name)
     llm = class_(**llm_parameters)
@@ -101,12 +105,15 @@ def chat(
     # NOTE: trial API keys may have very restrictive rules. It is plausible that you run into
     # constraints after the 2nd question.
 
-    results = [convo_qa_chain.invoke(
-        {
-            "input": question,
-            "chat_history": [],
-        }
-    ) for question in prompt_parameters]
+    results = [
+        convo_qa_chain.invoke(
+            {
+                "input": question,
+                "chat_history": [],
+            }
+        )
+        for question in prompt_parameters
+    ]
 
     # results = [qa({"question": question}) for question in prompt_parameters]
     chat_output_to_html(
