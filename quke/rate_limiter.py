@@ -4,15 +4,15 @@ rate_limiter.py
 This module manages rate limiters for limiting the rate of operations, particularly useful for
 controlling the rate of requests to APIs or other rate-sensitive systems.
 
-It uses an in-memory rate limiter implementation provided by the `langchain_core.rate_limiters` 
-module. The rate limiters are stored in a global dictionary and can be retrieved or created 
+It uses an in-memory rate limiter implementation provided by the `langchain_core.rate_limiters`
+module. The rate limiters are stored in a global dictionary and can be retrieved or created
 using their names.
 
 Functions:
-- create_rate_limiter(name: str, **kwargs): Creates a new rate limiter and adds it to the global 
+- create_rate_limiter(name: str, **kwargs): Creates a new rate limiter and adds it to the global
   dictionary if it does not already exist.
-- get_rate_limiter(name: str, **kwargs) -> InMemoryRateLimiter: Retrieves a rate limiter by name 
-  from the global dictionary. If it does not exist, it creates a new one using the provided 
+- get_rate_limiter(name: str, **kwargs) -> InMemoryRateLimiter: Retrieves a rate limiter by name
+  from the global dictionary. If it does not exist, it creates a new one using the provided
   parameters.
 
 Example usage:
@@ -22,14 +22,14 @@ Example usage:
         print(limiter)
 
 Global Variables:
-- rate_limiters (Dict[str, InMemoryRateLimiter]): A global dictionary that stores rate limiters 
+- rate_limiters (Dict[str, InMemoryRateLimiter]): A global dictionary that stores rate limiters
   by their names.
 
 Dependencies:
-- langchain_core.rate_limiters.InMemoryRateLimiter: The in-memory rate limiter class used to 
+- langchain_core.rate_limiters.InMemoryRateLimiter: The in-memory rate limiter class used to
   instantiate rate limiters.
 
-This module is designed to be flexible and can be extended or modified to support additional 
+This module is designed to be flexible and can be extended or modified to support additional
 features or different types of rate limiters as needed.
 """
 
