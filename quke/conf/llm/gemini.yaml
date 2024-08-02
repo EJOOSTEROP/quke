@@ -2,6 +2,9 @@ module_name_llm: langchain_google_genai
 class_name_llm: ChatGoogleGenerativeAI
 name: gemini-1.5-pro
 
+# rate_limiter is optional. If it exists it needs to refer to a limiter defined in config.yaml.
+rate_limiter: gemini
+
 llm_args:
   model: ${llm.name}
   temperature: 0

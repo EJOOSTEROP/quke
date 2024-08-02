@@ -6,6 +6,9 @@ embed_only: False
 
 # The parameters refer to langchain_core.rate_limiters.InMemoryRateLimiter
 rate_limiters:
+  - gemini:
+      requests_per_second: 0.03
+      check_every_n_seconds: 10
   - openai:
       requests_per_second: 0.03
       check_every_n_seconds: 5

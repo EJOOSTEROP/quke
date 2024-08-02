@@ -54,9 +54,6 @@ def chat(
     class_ = getattr(module, vectordb_import.class_name)
     vectordb = class_(embedding_function=embedding, persist_directory=vectordb_location)
 
-    print(llm_parameters)
-    raise NotImplementedError("Stopping for debugging.")
-
     module = importlib.import_module(llm_import.module_name)
     class_ = getattr(module, llm_import.class_name)
     llm = class_(**llm_parameters)

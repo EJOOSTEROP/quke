@@ -64,7 +64,7 @@ def create_rate_limiter(name: str, **kwargs):
     # Add the new rate limiter to the global dictionary
     rate_limiters[name] = rate_limiter
 
-    logging.info(f"Rate limiter '{name}' created with parameters: {kwargs}")
+    logging.info(f"Rate limiter '{name}' created with parameters: {kwargs}.")
 
 
 def get_rate_limiter(name: str, **kwargs) -> InMemoryRateLimiter:
